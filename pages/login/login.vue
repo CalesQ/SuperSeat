@@ -28,35 +28,49 @@
 	export default {
 		data() {
 			return {
-				schoolId: "2017302580014",
-				pwd: "202016"
+				schoolId: "",
+				pwd: ""
 			}
 		},
+		
+		onLoad() {
+			
+			this.init();
+			
+		},
+		
 		methods: {
+			
+			init() {
+				if(uni.getStorageSync("expire_time") > new Date().getTime()) {
+					uni.switchTab({
+						url: '../my/my'
+					})
+					return;
+				}
+				
+				this.schoolId = uni.getStorageSync("school_id") != undefined ? uni.getStorageSync("school_id") : "";
+			},
+			
 			login() {
 				var requestUrl = login_url + "?username=" + this.schoolId + "&password=" + this.pwd;
 				console.info(requestUrl);
 				
-				//sendRequest(requestUrl, 'GET', null, null, this.callback)
-				this.$axios({
-					method: 'get',
-					url: requestUrl,
-					// data: {
-					// 	userName: 'Lan',
-					// 	password: '123'
-					// },
-				})
-					.then(function(res) {
-						console.info(res);
-						
-					})
-					.catch(function(error) {
-						console.log(error.statusCode)
-					})
+				sendRequest(requestUrl, 'GET', null, null, this.callback)
 			},
 
 			callback(res) {
-				//console.log(res);
+				
+				// 保存token
+				uni.setStorageSync('token', res.data.token);
+				uni.setStorageSync('school_id', this.schoolId);
+				uni.setStorageSync('pwd', this.pwd);
+				var expireTime = new Date().getTime() + 6 * 60 * 1000;
+				uni.setStorageSync('expire_time', expireTime);
+				
+				uni.switchTab({
+					url: '../my/my'
+				})
 			}
 		}
 	}
