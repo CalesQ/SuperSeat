@@ -64,10 +64,14 @@
 
 		methods: {
 			init() {
+				uni.showLoading({
+					title: "正在获取历史记录..."
+				})
 				sendRequest(history_url, "GET", null, null, this.initCallback)
 			},
 
 			initCallback(res) {
+				uni.hideLoading();
 				this.reservationsList = res.data.reservations;
 				uni.stopPullDownRefresh(); //停止下拉刷新动画
 			},

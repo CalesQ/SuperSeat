@@ -55,8 +55,11 @@
 			login() {
 				var requestUrl = login_url + "?username=" + this.schoolId + "&password=" + this.pwd;
 				console.info(requestUrl);
-				
-				sendRequest(requestUrl, 'GET', null, null, this.callback)
+				uni.showLoading({
+					mask: true,
+					title: "正在登录..."
+				});
+				sendRequest(requestUrl, 'GET', null, null, this.callback);
 			},
 
 			callback(res) {
@@ -67,7 +70,7 @@
 				uni.setStorageSync('pwd', this.pwd);
 				var expireTime = new Date().getTime() + 6 * 60 * 1000;
 				uni.setStorageSync('expire_time', expireTime);
-				
+				uni.hideLoading();
 				uni.switchTab({
 					url: '../my/my'
 				})
