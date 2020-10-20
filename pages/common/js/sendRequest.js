@@ -27,6 +27,10 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 				callBack(res.data)
 				
 			} else if(res.data.status == "fail") {
+				if(res.data.code == "1" && res.data.message == "预约失败，请尽快选择其他时段或座位") {
+					callBack(res.data);
+					return;
+				}
 				uni.showToast({
 					icon: 'none',
 					title: res.data.message,

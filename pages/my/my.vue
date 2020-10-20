@@ -34,6 +34,9 @@
 				<view class="title">{{userInfo.reservationStatus == null ? "暂无" : reserveStat(userInfo.reservationStatus)}}</view>
 			</view>
 		</view>
+		<view class="padding flex flex-direction">
+			<button class="cu-btn bg-blue margin-tb-sm lg" @click="exit">退出登录</button>
+		</view>
 	</view>
 </template>
 
@@ -77,6 +80,16 @@
 					case "CHECK_IN": return "已签到";
 					default: return "离开";
 				}
+			},
+			
+			exit() {
+				uni.removeStorageSync("token");
+				uni.removeStorageSync("expire_time");
+				uni.removeStorageSync("pwd");
+				
+				uni.redirectTo({
+					url: "../login/login"
+				})
 			}
 		}
 	}
