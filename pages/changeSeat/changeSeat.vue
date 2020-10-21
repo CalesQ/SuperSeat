@@ -5,7 +5,10 @@
 			<block slot="content">改签</block>
 		</cu-custom>
 		<view class="bg-white padding">
-			<view class="cu-form-group margin-top">
+			<view class="grid margin-bottom text-center col-1">
+				<view class="padding" >您可改签的时段范围 {{start}} - {{end}}</view>
+			</view>
+			<view class="cu-form-group">
 				<view class="title">新的开始时间：</view>
 				<picker mode="time" :value="startTimeText" :start="start" :end="end" @change="bindSartTimeTextChange">
 					<view class="piker">{{startTimeText}}</view>
@@ -66,8 +69,12 @@
 		onLoad(options) {
 			this.start = options.start > getNowTimeText() ? options.start : getNowTimeText();
 			this.end = options.end;
+			
+			this.startTime = getTimeFromTimeText(options.start);
 			this.endTime = getTimeFromTimeText(options.end);
 			this.startTimeText = this.start;
+			this.endTimeText = this.end;
+			
 			this.seat = options.seatId;
 			this.date = options.date;
 			this.reserveId = options.reserveId;
@@ -80,6 +87,7 @@
 			 * 先结束使用
 			 */
 			endUseHandle() {
+		
 				if (this.startTime == null || this.startTime == '' || this.startTime == 0) {
 					uni.showToast({
 						icon: 'none',
@@ -100,6 +108,15 @@
 					});
 				} else {
 
+					if(this.start > this.startTimeText || this.end < this.endTimeText) {
+						uni.showToast({
+							icon: "none",
+							title: "您的选择超出可选范围，请修改",
+							duration: 1500
+						})
+						return;
+					}
+					
 					// 选择操作地址
 					var opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
 

@@ -3,8 +3,8 @@
 		<cu-custom bgColor="bg-gradual-blue" :isBack="false">
 			<block slot="content">预约记录</block>
 		</cu-custom>
-		<view v-show="reservationsList.length == 0">
-			无预约记录
+		<view v-show="reservationsList.length == 0" class="grid margin-bottom text-center col-1">
+			<view class="padding" >无预约记录</view>
 		</view>
 		<scroll-view scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
 		 :enable-back-to-top="true">
@@ -21,7 +21,7 @@
 						</view>
 						<view class="cu-form-group">
 							<view class="title">位置:</view>
-							<view class="title">{{item.location.replace("，", "")}}</view>
+							<view class="title">{{item.location.replace("，座位号", "").replace("信息馆","信图")}}</view>
 						</view>
 						<view class="cu-form-group">
 							<view class="title">状态:</view>
