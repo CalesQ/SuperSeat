@@ -72,11 +72,13 @@
 		book_url,
 		login_url
 	} from '@/pages/common/js/url.js'
-	import sendRequest from '@/pages/common/js/sendRequest.js'
+
 	import {
 		getNowDate,
 		getTomorrowDate
 	} from '@/pages/common/js/timeUtil.js'
+	import reGetTokenCallback from "@/pages/common/js/funcUtil.js"
+	import sendRequest from '@/pages/common/js/sendRequest.js'
 	export default {
 		data() {
 			return {
@@ -112,7 +114,7 @@
 				"modelShowMag": "",
 				"countNum": 0,
 				"checkFlag": true,
-				"bookOtherFlag": false
+				"bookOtherFlag": false,
 			}
 		},
 		methods: {
@@ -160,32 +162,49 @@
 
 			bookSeat() {
 
-				var time = new Date();
-				var nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
-
-				if (nowTime > "22:55:45") {
+				if (this.seatIndex == -1) {
 					uni.showToast({
-						icon: 'none',
-						title: "本时间段软件休息",
-					});
+						title: "请选择座位"
+					})
 					return;
-
-				} else if (nowTime < "22:40:00") {
-					this.date = getNowDate();
-					this.bookHandle();
-				} else if (nowTime > "22:45:00") {
-
-					this.date = getTomorrowDate();
-					this.bookHandle();
-
+				} else if (this.startTimeIndex == -1) {
+					uni.showToast({
+						title: "请选择开始时间"
+					})
+					return;
+				} else if (this.endTimeIndex == -1) {
+					uni.showToast({
+						title: "请选择结束时间"
+					})
+					return;
 				} else {
-					nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()
+					var time = new Date();
+					var nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
 
-					this.countNum = (22 - time.getHours()) * 3600 + (44 - time.getMinutes()) * 60 + (60 - time.getSeconds())
+					if (nowTime > "22:55:45") {
+						uni.showToast({
+							icon: 'none',
+							title: "本时间段软件休息",
+						});
+						return;
 
-					this.date = getTomorrowDate();
+					} else if (nowTime < "22:40:00") {
+						this.date = getNowDate();
+						this.bookHandle();
+					} else if (nowTime > "22:45:00") {
 
-					this.countDown();
+						this.date = getTomorrowDate();
+						this.bookHandle();
+
+					} else {
+						nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()
+
+						this.countNum = (22 - time.getHours()) * 3600 + (44 - time.getMinutes()) * 60 + (60 - time.getSeconds())
+
+						this.date = getTomorrowDate();
+
+						this.countDown();
+					}
 				}
 			},
 
@@ -202,29 +221,19 @@
 					}
 					this.seat = this.seats[this.seatPicker[this.seatIndex]]
 					var that = this;
-					setTimeout(function () {
-					   that.bookHandle();
-					}, 5000);
+					setTimeout(function() {
+						that.bookHandle();
+					}, 1000);
 					return;
 				}
+				uni.hideLoading();
 				uni.showToast({
 					icon: 'none',
 					title: "抢座成功",
+					duration: 1500
 				});
-				uni.hideLoading();
 				uni.switchTab({
 					url: "../history/history"
-				})
-			},
-
-			reGetTokenCallback(res) {
-				console.info("更新token成功")
-				uni.setStorageSync('token', res.data.token);
-				var expireTime = new Date().getTime() + 6 * 60 * 1000;
-				uni.setStorageSync('expire_time', expireTime);
-				uni.showToast({
-					icon: "none",
-					title: "更新token成功"
 				})
 			},
 
@@ -240,7 +249,7 @@
 				console.info(body);
 				uni.showLoading({
 					mask: true,
-					title: "正在抢座..."
+					title: "正在抢座"
 				})
 				sendRequest(book_url, "POST", body, null, this.bookCallback);
 			},
@@ -266,24 +275,24 @@
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
 						console.info("更新token")
-						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
+						sendRequest(loginUrl, 'GET', null, null, reGetTokenCallback)
 					}
 					// 倒计时
 					this.countNum--;
 					this.modelShowMag = this.countNum + " S";
 				}, 1000);
 			},
-		
+
 			seatPickerChange(e) {
 				this.seatIndex = e.target.value;
 				this.seat = this.seats[this.seatPicker[e.target.value]]
 			},
-			
+
 			startPickerChange(e) {
 				this.startTimeIndex = e.target.value;
 				this.start = startTime[this.startPicker[e.target.value]]
 			},
-			
+
 			endPickerChange(e) {
 				this.endTimeIndex = e.target.value;
 				this.end = endTime[this.endPicker[e.target.value]]

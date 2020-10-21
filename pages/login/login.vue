@@ -57,7 +57,7 @@
 				console.info(requestUrl);
 				uni.showLoading({
 					mask: true,
-					title: "正在登录..."
+					title: "正在登录"
 				});
 				sendRequest(requestUrl, 'GET', null, null, this.callback);
 			},
@@ -68,7 +68,7 @@
 				uni.setStorageSync('token', res.data.token);
 				uni.setStorageSync('school_id', this.schoolId);
 				uni.setStorageSync('pwd', this.pwd);
-				var expireTime = new Date().getTime() + 6 * 60 * 1000;
+				var expireTime = new Date().getTime() + 10 * 60 * 1000;
 				uni.setStorageSync('expire_time', expireTime);
 				uni.hideLoading();
 				uni.switchTab({

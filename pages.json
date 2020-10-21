@@ -13,8 +13,12 @@
 		}, {
 			"path": "pages/history/history",
 			"style": {
-				"enablePullDownRefresh": true  //设置为true表示当前页面开启下拉刷新
+				"enablePullDownRefresh": true //设置为true表示当前页面开启下拉刷新
 			}
+		}, {
+			"path": "pages/changeSeat/changeSeat",
+			"style": {}
+
 		}
 	],
 

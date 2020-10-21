@@ -78,7 +78,8 @@
 			reserveStat(s) {
 				switch(s) {
 					case "CHECK_IN": return "已签到";
-					default: return "离开";
+					case "AWAY": return "离开";
+					default: return "未签到";
 				}
 			},
 			

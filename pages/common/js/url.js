@@ -13,3 +13,4 @@ export const history_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/1
 export const usr_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/user"; // 用户信息API
 export const cancel_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/"; // 取消预约API + 预约ID
 export const stop_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/stop"; // 座位释放API  不需要其它ID
+export const reservations_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/user/reservations"

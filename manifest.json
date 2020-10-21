@@ -78,9 +78,9 @@
             "splashscreen" : {
                 "androidStyle" : "default",
                 "android" : {
-                    "hdpi" : "/Users/calesq/Desktop/QQ20201017-153955.png",
-                    "xhdpi" : "/Users/calesq/Desktop/QQ20201017-153955.png",
-                    "xxhdpi" : "/Users/calesq/Desktop/QQ20201017-153955.png"
+                    "hdpi" : "/Users/calesq/Desktop/superseat.png",
+                    "xhdpi" : "/Users/calesq/Desktop/superseat.png",
+                    "xxhdpi" : "/Users/calesq/Desktop/superseat.png"
                 }
             }
         }
