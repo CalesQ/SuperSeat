@@ -77,7 +77,6 @@
 		getNowDate,
 		getTomorrowDate
 	} from '@/pages/common/js/timeUtil.js'
-	import reGetTokenCallback from "@/pages/common/js/funcUtil.js"
 	import sendRequest from '@/pages/common/js/sendRequest.js'
 	export default {
 		data() {
@@ -271,17 +270,29 @@
 						this.bookHandle();
 					}
 					// 更新token
-					if (this.countNum == 30) {
+					if (this.countNum == 40) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
 						console.info("更新token")
-						sendRequest(loginUrl, 'GET', null, null, reGetTokenCallback)
+						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
 					}
 					// 倒计时
 					this.countNum--;
 					this.modelShowMag = this.countNum + " S";
 				}, 1000);
 			},
+
+			reGetTokenCallback(res) {
+			 	console.info("更新token成功")
+			 	uni.setStorageSync('token', res.data.token);
+			 	var expireTime = new Date().getTime() + 10 * 60 * 1000;
+			 	uni.setStorageSync('expire_time', expireTime);
+			 	uni.showToast({
+			 		icon: "none",
+			 		title: "更新token成功",
+					duration: 1500
+			 	})
+			 },
 
 			seatPickerChange(e) {
 				this.seatIndex = e.target.value;

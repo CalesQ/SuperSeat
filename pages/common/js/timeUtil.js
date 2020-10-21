@@ -1,7 +1,7 @@
 function getNowTimeText() {
 	var date = new Date();
 	return (date.getHours().toString().length < 2 ? "0" + date.getHours() : date.getHours()) + ':' + ((date.getMinutes() + 5).toString()
-		.length < 2 ? "0" + date.getMinutes() : date.getMinutes());
+		.length < 2 ? "0" + (date.getMinutes() + 5) : (date.getMinutes() + 5));
 }
 
 function getNowDate() {

@@ -5,7 +5,8 @@ function reGetTokenCallback(res) {
  	uni.setStorageSync('expire_time', expireTime);
  	uni.showToast({
  		icon: "none",
- 		title: "更新token成功"
+ 		title: "更新token成功",
+		duration: 1500
  	})
  }
  

@@ -6,7 +6,7 @@
 		</cu-custom>
 		<view class="bg-white padding">
 			<view class="grid margin-bottom text-center col-1">
-				<view class="padding" >您可改签的时段范围 {{start}} - {{end}}</view>
+				<view class="padding">您可改签的时段范围 {{start}} - {{end}}</view>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">新的开始时间：</view>
@@ -41,7 +41,6 @@
 		getTimeFromTimeText,
 		getNowTimeText
 	} from "@/pages/common/js/timeUtil.js"
-	import reGetTokenCallback from "@/pages/common/js/funcUtil.js"
 	import sendRequest from "@/pages/common/js/sendRequest.js"
 
 	export default {
@@ -59,7 +58,7 @@
 				"endTime": "",
 				"seat": "",
 				"date": "",
-				
+
 				// 取消参数
 				"reserveId": "",
 				"status": ""
@@ -69,12 +68,12 @@
 		onLoad(options) {
 			this.start = options.start > getNowTimeText() ? options.start : getNowTimeText();
 			this.end = options.end;
-			
+
 			this.startTime = getTimeFromTimeText(options.start);
 			this.endTime = getTimeFromTimeText(options.end);
 			this.startTimeText = this.start;
 			this.endTimeText = this.end;
-			
+
 			this.seat = options.seatId;
 			this.date = options.date;
 			this.reserveId = options.reserveId;
@@ -87,7 +86,7 @@
 			 * 先结束使用
 			 */
 			endUseHandle() {
-		
+
 				if (this.startTime == null || this.startTime == '' || this.startTime == 0) {
 					uni.showToast({
 						icon: 'none',
@@ -108,7 +107,7 @@
 					});
 				} else {
 
-					if(this.start > this.startTimeText || this.end < this.endTimeText) {
+					if (this.start > this.startTimeText || this.end < this.endTimeText) {
 						uni.showToast({
 							icon: "none",
 							title: "您的选择超出可选范围，请修改",
@@ -116,7 +115,7 @@
 						})
 						return;
 					}
-					
+
 					// 选择操作地址
 					var opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
 
@@ -126,7 +125,7 @@
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
 						console.info("更新token")
-						sendRequest(loginUrl, 'GET', null, null, reGetTokenCallback)
+						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
 
 						// 阻塞3秒等待更新
 						setTimeout(function() {
@@ -136,6 +135,18 @@
 						sendRequest(opUrl, "GET", null, null, this.endUseCallback);
 					}
 				}
+			},
+
+			reGetTokenCallback(res) {
+				console.info("更新token成功")
+				uni.setStorageSync('token', res.data.token);
+				var expireTime = new Date().getTime() + 10 * 60 * 1000;
+				uni.setStorageSync('expire_time', expireTime);
+				uni.showToast({
+					icon: "none",
+					title: "更新token成功",
+					duration: 1500
+				})
 			},
 
 			endUseCallback(res) {
