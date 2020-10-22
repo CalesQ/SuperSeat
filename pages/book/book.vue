@@ -208,6 +208,15 @@
 			},
 
 			bookCallback(res) {
+				if(res.code == 12) {
+					var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
+						"pwd");
+					console.info("更新token");
+					sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback);
+					setTimeout(function() {
+					}, 2000);
+				}
+				
 				if (res.status == "fail") {
 					this.seatIndex += 1;
 					if (this.seatIndex >= this.seatsCount) {
@@ -227,10 +236,11 @@
 				}
 				uni.hideLoading();
 				uni.showToast({
-					icon: 'none',
+					icon: 'success',
 					title: "抢座成功",
 					duration: 1500
 				});
+				uni.setStorageSync("history_update", true)
 				uni.switchTab({
 					url: "../history/history"
 				})
@@ -270,7 +280,7 @@
 						this.bookHandle();
 					}
 					// 更新token
-					if (this.countNum == 40) {
+					if (this.countNum == 30) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
 						console.info("更新token")
@@ -288,9 +298,9 @@
 			 	var expireTime = new Date().getTime() + 10 * 60 * 1000;
 			 	uni.setStorageSync('expire_time', expireTime);
 			 	uni.showToast({
-			 		icon: "none",
+			 		icon: "success",
 			 		title: "更新token成功",
-					duration: 1500
+					duration: 1200
 			 	})
 			 },
 

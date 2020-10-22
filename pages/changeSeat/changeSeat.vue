@@ -86,7 +86,10 @@
 			 * 先结束使用
 			 */
 			endUseHandle() {
-
+				uni.showLoading({
+					mask: true,
+					title: "正在改签"
+				})
 				if (this.startTime == null || this.startTime == '' || this.startTime == 0) {
 					uni.showToast({
 						icon: 'none',
@@ -167,15 +170,23 @@
 					"t2": "2",
 				}
 				console.info(data);
-				uni.showLoading({
-					mask: true,
-					title: "正在改签..."
-				})
+
 				sendRequest(book_url, "POST", data, null, this.bookCallback);
 			},
 
 			bookCallback(res) {
 				uni.hideLoading();
+
+				if (res.code == 12) {
+					uni.removeStorageSync("token");
+					uni.removeStorageSync("expire_time");
+					uni.removeStorageSync("pwd");
+					uni.reLaunch({
+						url: "../login/login"
+					})
+					return;
+				}
+
 				if (res.data.status == "fail") {
 					uni.showToast({
 						icon: 'none',
@@ -190,6 +201,7 @@
 					title: "改签成功",
 					duration: 1500
 				});
+				uni.setStorageSync('history_update', true);
 				uni.switchTab({
 					url: "../history/history"
 				})

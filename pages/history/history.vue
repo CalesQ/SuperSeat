@@ -61,13 +61,19 @@
 			}
 		},
 
-		onShow() {
+		onLoad(options) {
 			this.init();
+		},
+
+		onShow(options) {
+			if(uni.getStorageSync("history_update")) {
+				uni.setStorageSync("history_update", false);
+				this.init();
+			}
 		},
 
 		onPullDownRefresh() {
 			//监听下拉刷新动作的执行方法，每次手动下拉刷新都会执行一次
-			console.log('refresh');
 			this.init();
 		},
 
@@ -84,6 +90,17 @@
 
 			initCallback(res) {
 				uni.hideLoading();
+				
+				if(res.code == 12) {
+					uni.removeStorageSync("token");
+					uni.removeStorageSync("expire_time");
+					uni.removeStorageSync("pwd");
+					uni.reLaunch({
+						url: "../login/login"
+					})
+					return;
+				}
+				
 				this.reservationsList = res.data == null ? [] : res.data;
 				uni.stopPullDownRefresh(); //停止下拉刷新动画
 				if (this.reservationsList.length == 0) {

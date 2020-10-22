@@ -34,22 +34,17 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 				uni.showToast({
 					icon: 'none',
 					title: res.data.message,
+					duration: 1500
 				});
 				if(res.data.code == "12") {
-					uni.reLaunch({
-						url: '/pages/login/login.vue'
-					});
+					callBack(res.data);
 				}
 			}
 			else if (res.statusCode == 403) {
 				uni.showToast({
 					icon: 'none',
 					title: '请重新登录',
-				});
-
-				uni.reLaunch({
-					url: '/pages/login/login.vue'
-				});
+				});			
 			} else {
 				uni.showToast({
 					icon: 'none',

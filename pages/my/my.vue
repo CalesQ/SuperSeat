@@ -72,6 +72,13 @@
 			},
 			
 			callback(res) {
+				if(res.code == 12) {
+					this.removeUserInfo();
+					uni.reLaunch({
+						url: "../login/login"
+					})
+					return;
+				}
 				this.userInfo = res.data;
 			},
 			
@@ -84,13 +91,17 @@
 			},
 			
 			exit() {
-				uni.removeStorageSync("token");
-				uni.removeStorageSync("expire_time");
-				uni.removeStorageSync("pwd");
+				this.removeUserInfo();
 				
 				uni.redirectTo({
 					url: "../login/login"
 				})
+			},
+			
+			removeUserInfo() {
+				uni.removeStorageSync("token");
+				uni.removeStorageSync("expire_time");
+				uni.removeStorageSync("pwd");
 			}
 		}
 	}
