@@ -75,14 +75,18 @@
 
 	import {
 		getNowDate,
-		getTomorrowDate
+		getTomorrowDate,
+		getNowTimeText,
+		getNowTimeYDSText
 	} from '@/pages/common/js/timeUtil.js'
 	import sendRequest from '@/pages/common/js/sendRequest.js'
 	export default {
 		data() {
 			return {
-				'roomPicker': ['一楼3C创客空间', '一楼3C创客电子阅读', "一楼3C创客-双屏电脑(20台)", '一楼创新学习讨论区', "创新学习-MAC电脑（12台）", "创新学习-云桌面（42台）",
-					'二楼西自然科学图书借阅区', '二楼东自然科学图书借阅区', '三楼西社会科学图书借阅区', '三楼自主学习区', '三楼东社会科学图书借阅区', '四楼东图书阅览区', '四楼西图书阅览区',
+				'roomPicker': ['一楼 3C创客空间', '一楼 3C创客-咖啡区', '一楼 3C创客-电子阅读', "一楼 3C创客-双屏电脑", '一楼 创新学习-MAC电脑', "一楼 创新学习-云桌面",
+					"一楼 创新学习-讨论区",
+					'一楼 创新学习-沙发区', '二楼 西自然科学区', '二楼 东自然科学区', '二楼 中厅沙发区', '三楼 西社会科学区', '三楼 东社会科学区', '三楼 自主学习区', '三楼 中厅沙发区',
+					'四楼 西图书阅览区', '四楼 东图书阅览区',
 				],
 				"seatPicker": null,
 				"seats": {},
@@ -118,8 +122,7 @@
 		},
 		methods: {
 			checkTime() {
-				var time = new Date();
-				var nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+				var nowTime = getNowTimeYDSText();
 
 				if (nowTime < "22:40:00") {
 					this.checkFlag = true;
@@ -136,7 +139,12 @@
 				this.roomIndex = e.target.value;
 				var roomName = this.roomPicker[e.target.value];
 				this.room = roomDic[roomName]
-				var newUrl = layout_url + this.room + "/" + getNowDate();
+				var newUrl = "";
+				if (getNowTimeText() >= "22:45:00") {
+					newUrl = layout_url + this.room + "/" + getNowDate();
+				} else {
+					newUrl = layout_url + this.room + "/" + getTomorrowDate();
+				}
 				console.info(newUrl, uni.getStorageSync('token'))
 				sendRequest(newUrl, 'GET', null, null, this.callback)
 			},
@@ -154,7 +162,10 @@
 						this.seats[layout[key].name] = layout[key].id;
 					}
 				}
+				this.seatsIndex = -1;
+				this.seatIndex = 0;
 				this.seatPicker = Object.keys(this.seats);
+				this.seat = this.seats[this.seatPicker[0]]
 				this.seatsCount = this.seatPicker.length;
 				console.info(this.seatPicker);
 			},
@@ -177,10 +188,10 @@
 					})
 					return;
 				} else {
-					var time = new Date();
-					var nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
-
-					if (nowTime > "22:55:45") {
+					var d = new Date()
+					var nowTime = getNowTimeYDSText()
+					console.info(nowTime)
+					if (nowTime > "23:14:59") {
 						uni.showToast({
 							icon: 'none',
 							title: "本时间段软件休息",
@@ -196,7 +207,6 @@
 						this.bookHandle();
 
 					} else {
-						nowTime = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()
 
 						this.countNum = (22 - time.getHours()) * 3600 + (44 - time.getMinutes()) * 60 + (60 - time.getSeconds())
 
@@ -208,18 +218,17 @@
 			},
 
 			bookCallback(res) {
-				if(res.code == 12) {
+				if (res.code == 12) {
 					var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 						"pwd");
 					console.info("更新token");
 					sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback);
-					setTimeout(function() {
-					}, 2000);
+					setTimeout(function() {}, 2000);
 				}
-				
+
 				if (res.status == "fail") {
-					this.seatIndex += 1;
-					if (this.seatIndex >= this.seatsCount) {
+					this.seatsIndex += 1;
+					if (this.seatsIndex >= this.seatsCount) {
 						uni.showToast({
 							icon: 'none',
 							title: "抢座失败，附近的座位也没了，请在看看别的吧",
@@ -227,7 +236,7 @@
 						});
 						return;
 					}
-					this.seat = this.seats[this.seatPicker[this.seatIndex]]
+					this.seat = this.seats[this.seatPicker[this.seatsIndex]]
 					var that = this;
 					setTimeout(function() {
 						that.bookHandle();
@@ -247,6 +256,7 @@
 			},
 
 			bookHandle() {
+				uni.hideLoading();
 				var body = {
 					"t": "1",
 					"startTime": this.start,
@@ -272,10 +282,18 @@
 				this.countDownFlag = !this.countDownFlag;
 				// 设置倒计时
 				this.intervalBtn = setInterval(() => {
-					if (this.countNum <= 1) {
+					// 5秒倒计时
+					if (this.countNum <= 5) {
 						// 清除定时器
 						clearInterval(this.intervalBtn)
 						this.countDownFlag = false;
+						uni.showLoading({
+							title: "最后倒计时抢座"
+						})
+						while (getNowTimeText() < "22:45:00") {
+							// 循环
+							setTimeout(function() {}, 200);
+						}
 						// 抢座
 						this.bookHandle();
 					}
@@ -293,16 +311,16 @@
 			},
 
 			reGetTokenCallback(res) {
-			 	console.info("更新token成功")
-			 	uni.setStorageSync('token', res.data.token);
-			 	var expireTime = new Date().getTime() + 10 * 60 * 1000;
-			 	uni.setStorageSync('expire_time', expireTime);
-			 	uni.showToast({
-			 		icon: "success",
-			 		title: "更新token成功",
+				console.info("更新token成功")
+				uni.setStorageSync('token', res.data.token);
+				var expireTime = new Date().getTime() + 10 * 60 * 1000;
+				uni.setStorageSync('expire_time', expireTime);
+				uni.showToast({
+					icon: "success",
+					title: "更新token成功",
 					duration: 1200
-			 	})
-			 },
+				})
+			},
 
 			seatPickerChange(e) {
 				this.seatIndex = e.target.value;

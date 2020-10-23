@@ -1,6 +1,12 @@
 <script>
 	import Vue from 'vue'
 	export default {
+
+		data() {
+			return {
+			}
+		},
+
 		onLaunch: function() {
 			uni.getSystemInfo({
 				success: function(e) {
@@ -104,6 +110,98 @@
 				},
 			]
 
+			//在线更新
+			//#ifdef APP-PLUS  
+			var updateServer = "http://47.93.211.200:5000/update"; //检查更新地址
+
+			plus.runtime.getProperty(plus.runtime.appid, function(inf) {
+				uni.setStorageSync("wgt_version", inf.version);
+			});
+			console.info(uni.getStorageSync("wgt_version"))
+			var req = { //升级检测数据  
+				"appid": plus.runtime.appid,
+				"version": uni.getStorageSync("wgt_version")
+			};
+
+			uni.request({
+				url: updateServer,
+				data: req,
+				success: (res) => {
+					console.info(res);
+					var downloadUrl = res.data.url
+					if (res.statusCode == 200 && res.data.status === 1) {
+						uni.showModal({ //提醒用户更新  
+							title: "更新提示",
+							content: res.data.msg,
+							success: (res) => {
+								if (res.confirm) {
+									uni.showLoading({
+										title: "正在下载更新包"
+									})
+									let downloadTask = uni.downloadFile({
+										url: downloadUrl,
+										success(downloadResult) {
+
+											if (downloadResult.statusCode === 200) {
+												uni.hideLoading()
+												uni.showToast({
+													icon: "none",
+													title: "下载完成，安装中",
+													duration: 1200
+												})
+												plus.runtime.install(
+													downloadResult.tempFilePath, {
+														force: true
+													},
+													function() {
+														uni.hideLoading();
+														uni.showToast({
+															icon: "none",
+															title: "安装完成，即将重启应用",
+															duration: 1200,
+														})
+														uni.hideLoading();
+														setTimeout(() => {
+															plus.runtime.restart();
+														}, 2000);
+													},
+													function(e) {
+														uni.showToast({
+															icon: 'none',
+															title: e
+														});
+													}
+												);
+											} else {
+												uni.showToast({
+													icon: "none",
+													title: "更新包下载失败"
+												})
+												uni.hideLoading();
+											}
+										},
+										fail(e) {
+											that.content = e
+											setTimeout(() => {
+												that.$refs.mdLoading.hide()
+											}, 1000)
+										}
+									});
+
+									// 监听下载进度
+									downloadTask.onProgressUpdate((e) => {
+										uni.showLoading({
+											title: '下载中...' + e.progress + ' %',
+										})
+									})
+								}
+							}
+						});
+					}
+				}
+			})
+
+			//#endif  
 		},
 		onShow: function() {
 			console.log('App Show')

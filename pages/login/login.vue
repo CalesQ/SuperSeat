@@ -53,6 +53,7 @@
 			},
 			
 			login() {
+				
 				var requestUrl = login_url + "?username=" + this.schoolId + "&password=" + this.pwd;
 				console.info(requestUrl);
 				uni.showLoading({

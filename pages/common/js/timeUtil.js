@@ -1,7 +1,16 @@
 function getNowTimeText() {
 	var date = new Date();
-	return (date.getHours().toString().length < 2 ? "0" + date.getHours() : date.getHours()) + ':' + ((date.getMinutes() + 5).toString()
+	return (date.getHours().toString().length < 2 ? "0" + date.getHours() : date.getHours()) + ':' + ((date.getMinutes() +
+			5).toString()
 		.length < 2 ? "0" + (date.getMinutes() + 5) : (date.getMinutes() + 5));
+}
+
+function getNowTimeYDSText() {
+	var date = new Date();
+	return (date.getHours().toString().length < 2 ? ("0" + date.getHours()) : date.getHours()) + ':' + ((date.getMinutes() +
+			5).toString()
+		.length < 2 ? "0" + (date.getMinutes() + 5) : (date.getMinutes() + 5)) + ":" + (date.getSeconds().toString().length <
+		2 ? ("0" + date.getSeconds()) : date.getSeconds());
 }
 
 function getNowDate() {
@@ -42,5 +51,6 @@ export {
 	getNowDate,
 	getTomorrowDate,
 	getTimeFromTimeText,
-	getTimeTextFromTime
+	getTimeTextFromTime,
+	getNowTimeYDSText
 };
