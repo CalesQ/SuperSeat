@@ -57,7 +57,8 @@
 	export default {
 		data() {
 			return {
-				'reservationsList': []
+				'reservationsList': [],
+				time: ""
 			}
 		},
 

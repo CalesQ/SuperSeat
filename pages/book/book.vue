@@ -76,7 +76,6 @@
 	import {
 		getNowDate,
 		getTomorrowDate,
-		getNowTimeText,
 		getNowTimeYDSText
 	} from '@/pages/common/js/timeUtil.js'
 	import sendRequest from '@/pages/common/js/sendRequest.js'
@@ -140,7 +139,7 @@
 				var roomName = this.roomPicker[e.target.value];
 				this.room = roomDic[roomName]
 				var newUrl = "";
-				if (getNowTimeText() >= "22:45:00") {
+				if (getNowTimeYDSText() >= "22:45:00") {
 					newUrl = layout_url + this.room + "/" + getNowDate();
 				} else {
 					newUrl = layout_url + this.room + "/" + getTomorrowDate();
@@ -290,7 +289,7 @@
 						uni.showLoading({
 							title: "最后倒计时抢座"
 						})
-						while (getNowTimeText() < "22:45:00") {
+						while (getNowTimeYDSText() < "22:45:00") {
 							// 循环
 							setTimeout(function() {}, 200);
 						}

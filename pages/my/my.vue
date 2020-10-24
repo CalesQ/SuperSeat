@@ -57,7 +57,7 @@
 					'lastIn': null,
 					'lastOut': null,
 					'reservationStatus': null
-				}
+				},
 			}
 		},
 		
