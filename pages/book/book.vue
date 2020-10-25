@@ -199,9 +199,9 @@
 						this.bookHandle();
 
 					} else {
-
+						var time = new Date()
 						this.countNum = (22 - time.getHours()) * 3600 + (44 - time.getMinutes()) * 60 + (60 - time.getSeconds())
-
+						//this.countNum = (22 - time.getHours()) * 3600 + (53 - time.getMinutes()) * 60 + (60 - time.getSeconds())
 						this.date = getTomorrowDate();
 
 						this.countDown();
@@ -275,17 +275,10 @@
 				// 设置倒计时
 				this.intervalBtn = setInterval(() => {
 					// 5秒倒计时
-					if (this.countNum <= 5) {
+					if (this.countNum == 1) {
 						// 清除定时器
 						clearInterval(this.intervalBtn)
 						this.countDownFlag = false;
-						uni.showLoading({
-							title: "最后倒计时抢座"
-						})
-						while (getNowTimeYDSText() < "22:45:00") {
-							// 循环
-							setTimeout(function() {}, 200);
-						}
 						// 抢座
 						this.bookHandle();
 					}
