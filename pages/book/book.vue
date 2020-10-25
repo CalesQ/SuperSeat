@@ -190,14 +190,7 @@
 					var d = new Date()
 					var nowTime = getNowTimeYDSText()
 					console.info(nowTime)
-					if (nowTime > "23:14:59") {
-						uni.showToast({
-							icon: 'none',
-							title: "本时间段软件休息",
-						});
-						return;
-
-					} else if (nowTime < "22:40:00") {
+					if (nowTime < "22:40:00") {
 						this.date = getNowDate();
 						this.bookHandle();
 					} else if (nowTime > "22:45:00") {

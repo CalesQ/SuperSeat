@@ -3,10 +3,11 @@
 		<cu-custom bgColor="bg-gradual-blue" :isBack="false">
 			<block slot="content">预约记录</block>
 		</cu-custom>
-		<view v-show="reservationsList.length == 0" class="grid margin-bottom text-center col-1">
+		<view v-show="reservationsList.length == 0 && historyList.length == 0" class="grid margin-bottom text-center col-1">
 			<view class="padding" >无预约记录</view>
 		</view>
-		<scroll-view scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
+		<!-- 预约记录 -->
+		<scroll-view v-show="!isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
 		 :enable-back-to-top="true">
 			<block v-for="(item,index) in reservationsList" :key="index">
 				<view class="cu-card case">
@@ -43,6 +44,43 @@
 				</view>
 			</block>
 		</scroll-view>
+		
+		<!-- 历史记录 -->
+		<scroll-view v-show="isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
+		 :enable-back-to-top="true">
+			<block v-for="(item,index) in historyList" :key="index">
+				<view class="cu-card case">
+					<view class="cu-item shadow">
+						<view class="cu-form-group">
+							<view class="title">日期:</view>
+							<view class="title">{{item.date}}</view>
+						</view>
+						<view class="cu-form-group">
+							<view class="title">时间:</view>
+							<view class="title">{{item.begin}} ~ {{item.end}}</view>
+						</view>
+						<view class="cu-form-group">
+							<view class="title">位置:</view>
+							<view class="title">{{item.loc.replace("信息馆","信图")}}</view>
+						</view>
+						<view class="cu-form-group">
+							<view class="title">状态:</view>
+							<view class="title">{{changeType(item.stat)}}</view>
+						</view>
+						<view v-show="item.status == 'RESERVE'" class="cu-form-group">
+							<button @click="opHandle(index)" class="cu-btn round sm bg-red">取消</button>
+							<view class="title">明日凌晨01:30起才可改签</view>
+							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
+						</view>
+						<view v-show="item.status == 'CHECK_IN' || item.status == 'AWAY'" class="cu-form-group">
+							<button @click="opHandle(-1)" class="cu-btn round sm bg-red">结束</button>
+							<view class="title">明日凌晨01:30起才可改签</view>
+							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
+						</view>
+					</view>
+				</view>
+			</block>
+		</scroll-view>
 	</view>
 </template>
 
@@ -50,37 +88,64 @@
 	import {
 		reservations_url,
 		cancel_url,
-		stop_url
+		stop_url,
+		history_url
 	} from '@/pages/common/js/url.js'
+	import {
+		getNowTimeYDSText
+	} from '@/pages/common/js/timeUtil.js'
 	import sendRequest from '@/pages/common/js/sendRequest.js'
 
 	export default {
 		data() {
 			return {
 				'reservationsList': [],
-				time: ""
+				isHistory: false,
+				historyList: [],
+				divTime: '22:30:00'
 			}
 		},
 
 		onLoad(options) {
-			this.init();
+			if(getNowTimeYDSText() > this.divTime) {
+				this.isHistory = true;
+				// 获取的是历史记录
+				this.initHistory();
+			} else {
+				this.isHistory = false;
+				this.init();
+			}
 		},
 
 		onShow(options) {
 			if(uni.getStorageSync("history_update")) {
 				uni.setStorageSync("history_update", false);
-				this.init();
+				if(getNowTimeYDSText() > this.divTime) {
+					this.isHistory = true;
+					// 获取的是历史记录
+					this.initHistory();
+				} else {
+					this.isHistory = false;
+					this.init();
+				}
 			}
 		},
 
 		onPullDownRefresh() {
 			//监听下拉刷新动作的执行方法，每次手动下拉刷新都会执行一次
-			this.init();
+			if(getNowTimeYDSText() > this.divTime) {
+				this.isHistory = true;
+				// 获取的是历史记录
+				this.initHistory();
+			} else {
+				this.isHistory = false;
+				this.init();
+			}
 		},
 
 		methods: {
 			/**
-			 * 页面初始化函数
+			 * 页面初始化函数 -- 默认预约记录
 			 */
 			init() {
 				uni.showLoading({
@@ -102,16 +167,26 @@
 					return;
 				}
 				
-				this.reservationsList = res.data == null ? [] : res.data;
-				uni.stopPullDownRefresh(); //停止下拉刷新动画
-				if (this.reservationsList.length == 0) {
-					uni.showToast({
-						icon: "none",
-						title: "无预约记录",
-						duration: 1500
-					})
+				
+				if(this.isHistory) {
+					// 历史记录
+					this.historyList = res.data.reservations == null ? [] : res.data.reservations;					
+				} else {
+					// 预约记录
+					this.reservationsList = res.data == null ? [] : res.data;					
 				}
+				uni.stopPullDownRefresh(); //停止下拉刷新动画
 			},
+
+			/**
+			 * 获取历史记录列表
+			 */
+			initHistory() {
+				uni.showLoading({
+					title: "正在获取历史记录"
+				})
+				sendRequest(history_url, "GET", null, null, this.initCallback)
+			},			
 
 			/**
 			 * 取消/结束操作事件

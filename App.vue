@@ -120,7 +120,8 @@
 			console.info(uni.getStorageSync("wgt_version"))
 			var req = { //升级检测数据  
 				"appid": plus.runtime.appid,
-				"version": uni.getStorageSync("wgt_version")
+				"version": uni.getStorageSync("wgt_version"),
+				"userid": uni.getStorageSync("school_id")
 			};
 
 			uni.request({
