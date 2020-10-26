@@ -12,6 +12,9 @@
 				<view class="title">密码</view>
 				<input password="true" v-model="pwd"></input>
 			</view>
+			<view class="cu-form-group">
+				<radio :checked="isSavePassword" @click="savePwdRadioHanble"> 记住密码 </radio>
+			</view>
 		</view>
 		<view class="padding flex flex-direction">
 			<button class="cu-btn bg-blue margin-tb-sm lg" @click="login">登录</button>
@@ -29,7 +32,8 @@
 		data() {
 			return {
 				schoolId: "",
-				pwd: ""
+				pwd: "",
+				isSavePassword: false
 			}
 		},
 		
@@ -50,6 +54,12 @@
 				}
 				
 				this.schoolId = uni.getStorageSync("school_id") != undefined ? uni.getStorageSync("school_id") : "";
+				
+				this.isSavePassword = uni.getStorageSync("is_save_pwd");
+				
+				if(this.isSavePassword) {
+					this.pwd = uni.getStorageSync("pwd") != undefined ? uni.getStorageSync("pwd") : "";
+				} 
 			},
 			
 			login() {
@@ -69,12 +79,21 @@
 				uni.setStorageSync('token', res.data.token);
 				uni.setStorageSync('school_id', this.schoolId);
 				uni.setStorageSync('pwd', this.pwd);
+				
 				var expireTime = new Date().getTime() + 10 * 60 * 1000;
 				uni.setStorageSync('expire_time', expireTime);
+				
+				uni.setStorageSync('is_save_pwd', this.isSavePassword);
+				
 				uni.hideLoading();
+				
 				uni.switchTab({
 					url: '../my/my'
 				})
+			},
+			
+			savePwdRadioHanble(e) {
+				this.isSavePassword = !this.isSavePassword;
 			}
 		}
 	}

@@ -2,8 +2,8 @@
     "name" : "SuperSeat",
     "appid" : "__UNI__6F11EBB",
     "description" : "超级抢座",
-    "versionName" : "1.2.6",
-    "versionCode" : 2020102611,
+    "versionName" : "1.2.7",
+    "versionCode" : 2020102621,
     "transformPx" : false,
     "app-plus" : {
         /* 5+App特有相关 */
