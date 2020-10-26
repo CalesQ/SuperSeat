@@ -67,14 +67,14 @@
 							<view class="title">状态:</view>
 							<view class="title">{{changeType(item.stat)}}</view>
 						</view>
-						<view v-show="item.status == 'RESERVE'" class="cu-form-group">
+						<view v-show="item.stat == 'RESERVE'" class="cu-form-group">
 							<button @click="opHandle(index)" class="cu-btn round sm bg-red">取消</button>
-							<view class="title">明日凌晨01:30起才可改签</view>
+							<view class="title">次日凌晨01:00起才可改签</view>
 							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
 						</view>
-						<view v-show="item.status == 'CHECK_IN' || item.status == 'AWAY'" class="cu-form-group">
+						<view v-show="item.stat == 'CHECK_IN' || item.stat == 'AWAY'" class="cu-form-group">
 							<button @click="opHandle(-1)" class="cu-btn round sm bg-red">结束</button>
-							<view class="title">明日凌晨01:30起才可改签</view>
+							<view class="title">次日凌晨01:00起才可改签</view>
 							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
 						</view>
 					</view>
