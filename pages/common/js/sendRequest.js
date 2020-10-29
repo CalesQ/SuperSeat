@@ -48,7 +48,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			} else {
 				uni.showToast({
 					icon: 'none',
-					title: '请稍后重试',
+					title: '请求错误，请稍后重试',
 				});
 			}
 		},
@@ -57,7 +57,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			console.log(res);
 			uni.showToast({
 				icon: 'none',
-				title: '请稍后重试',
+				title: '网络错误，请稍后重试',
 			});
 		},
 
