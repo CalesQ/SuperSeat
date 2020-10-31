@@ -170,7 +170,6 @@
 			},
 
 			bookSeat() {
-
 				if (this.seatIndex == -1) {
 					uni.showToast({
 						title: "请选择座位"
@@ -268,14 +267,25 @@
 			// 倒计时
 			countDown() {
 
+				var date = new Date();
+				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime();
+
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
+
 				// 更改model状态
 				this.countDownFlag = !this.countDownFlag;
+
+				this.countNum *= 5;
+				
+				var nowTimeText  = "";
+				
 				// 设置倒计时
 				this.intervalBtn = setInterval(() => {
-					// 5秒倒计时
-					if (this.countNum == 1) {
+					nowTimeText = new Date().getTime();
+					if (nowTimeText >= orderTime || this.countNum <= 1) {
 						// 清除定时器
 						clearInterval(this.intervalBtn)
 						this.countDownFlag = false;
@@ -289,10 +299,15 @@
 						console.info("更新token")
 						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
 					}
-					// 倒计时
+					if (this.countNum > 5) {
+						// 倒计时
+						this.modelShowMag = this.countNum / 5.0 + "S";
+
+					} else {
+						this.modelShowMag = "	最后5秒倒计时！";
+					}
 					this.countNum--;
-					this.modelShowMag = this.countNum + " S";
-				}, 1000);
+				}, 200);
 			},
 
 			reGetTokenCallback(res) {
