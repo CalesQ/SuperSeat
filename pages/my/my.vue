@@ -99,6 +99,7 @@
 			},
 			
 			removeUserInfo() {
+				uni.setStorageSync("history_update", true);
 				uni.removeStorageSync("token");
 				uni.removeStorageSync("expire_time");
 				uni.removeStorageSync("pwd");

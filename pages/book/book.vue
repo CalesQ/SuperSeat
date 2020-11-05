@@ -47,7 +47,7 @@
 		<view class="padding flex flex-direction">
 			<button :disabled="checkFlag" class="cu-btn bg-blue margin-tb-sm lg" @click="bookSeat">开始抢座</button>
 		</view>
-
+		
 		<view class="cu-modal" :class="countDownFlag?'show':''">
 			<view class="cu-dialog">
 				<view class="cu-bar bg-white justify-end">
@@ -78,6 +78,12 @@
 		getTomorrowDate,
 		getNowTimeYDSText
 	} from '@/pages/common/js/timeUtil.js'
+	
+	import {
+		bookOther,
+		sleep
+	} from "@/pages/common/js/bookOtherSeat.js"
+	
 	import sendRequest from '@/pages/common/js/sendRequest.js'
 	export default {
 		data() {
@@ -119,6 +125,7 @@
 				"bookOtherFlag": false,
 			}
 		},
+		
 		methods: {
 			checkTime() {
 				var nowTime = getNowTimeYDSText();
@@ -131,6 +138,7 @@
 					})
 					return;
 				}
+				
 				this.checkFlag = false;
 			},
 
@@ -170,25 +178,30 @@
 			},
 
 			bookSeat() {
+				
 				if (this.seatIndex == -1) {
 					uni.showToast({
+						icon: "none",
 						title: "请选择座位"
 					})
 					return;
 				} else if (this.startTimeIndex == -1) {
 					uni.showToast({
+						icon: "none",
 						title: "请选择开始时间"
 					})
 					return;
 				} else if (this.endTimeIndex == -1) {
 					uni.showToast({
+						icon: "none",
 						title: "请选择结束时间"
 					})
 					return;
 				} else {
+					
 					var d = new Date()
 					var nowTime = getNowTimeYDSText()
-					console.info(nowTime)
+					
 					if (nowTime < "22:40:00") {
 						this.date = getNowDate();
 						this.bookHandle();
@@ -200,7 +213,7 @@
 					} else {
 						var time = new Date()
 						this.countNum = (22 - time.getHours()) * 3600 + (44 - time.getMinutes()) * 60 + (60 - time.getSeconds())
-						//this.countNum = (22 - time.getHours()) * 3600 + (53 - time.getMinutes()) * 60 + (60 - time.getSeconds())
+
 						this.date = getTomorrowDate();
 
 						this.countDown();
@@ -212,26 +225,27 @@
 				if (res.code == 12) {
 					var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 						"pwd");
-					console.info("更新token");
 					sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback);
-					setTimeout(function() {}, 2000);
+					sleep(2000)
 				}
 
 				if (res.status == "fail") {
-					this.seatsIndex += 1;
-					if (this.seatsIndex >= this.seatsCount) {
-						uni.showToast({
-							icon: 'none',
-							title: "抢座失败，附近的座位也没了，请在看看别的吧",
-							duration: 2000
-						});
-						return;
-					}
-					this.seat = this.seats[this.seatPicker[this.seatsIndex]]
-					var that = this;
-					setTimeout(function() {
-						that.bookHandle();
-					}, 1000);
+					// this.seatsIndex += 1;
+					// if (this.seatsIndex >= this.seatsCount) {
+					// 	uni.showToast({
+					// 		icon: 'none',
+					// 		title: "抢座失败，附近的座位也没了，请在看看别的吧",
+					// 		duration: 2000
+					// 	});
+					// 	return;
+					// }
+					// this.seat = this.seats[this.seatPicker[this.seatsIndex]]
+					// var that = this;
+					// setTimeout(function() {
+					// 	that.bookHandle();
+					// 	return;
+					// }, 500);
+					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
 				uni.hideLoading();
@@ -250,8 +264,8 @@
 				uni.hideLoading();
 				var body = {
 					"t": "1",
-					"startTime": this.start,
-					"endTime": this.end,
+					"startTime": this.start.toString(),
+					"endTime": this.end.toString(),
 					"seat": this.seat.toString(),
 					"date": this.date,
 					"t2": "2",
@@ -270,8 +284,8 @@
 				var date = new Date();
 				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 
-				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime();
-
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 500;
+				
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
 
@@ -285,33 +299,30 @@
 				// 设置倒计时
 				this.intervalBtn = setInterval(() => {
 					nowTimeText = new Date().getTime();
+					console.info(nowTimeText);
 					if (nowTimeText >= orderTime || this.countNum <= 1) {
+						
 						// 清除定时器
 						clearInterval(this.intervalBtn)
+						
 						this.countDownFlag = false;
 						// 抢座
 						this.bookHandle();
+						
 					}
 					// 更新token
-					if (this.countNum == 30) {
+					if (this.countNum == 75) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						console.info("更新token")
 						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
 					}
-					if (this.countNum > 5) {
-						// 倒计时
-						this.modelShowMag = this.countNum / 5.0 + "S";
 
-					} else {
-						this.modelShowMag = "	最后5秒倒计时！";
-					}
+					this.modelShowMag = parseFloat(this.countNum / 5) + "\tS";
 					this.countNum--;
 				}, 200);
 			},
 
 			reGetTokenCallback(res) {
-				console.info("更新token成功")
 				uni.setStorageSync('token', res.data.token);
 				var expireTime = new Date().getTime() + 10 * 60 * 1000;
 				uni.setStorageSync('expire_time', expireTime);
