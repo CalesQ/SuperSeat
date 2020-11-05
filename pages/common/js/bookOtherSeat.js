@@ -99,6 +99,9 @@ function sleep(numberMillis) {
 	}
 }
 
+/**
+ * 预约空座位
+ */
 function bookFromFreeList() {
 	uni.showLoading({
 		mask: true,
@@ -114,6 +117,9 @@ function bookFromFreeList() {
 	book(id);
 }
 
+/**
+ * @param {Object} seatId 预约座位函数
+ */
 function book(seatId) {
 	var body = {
 		"t": "1",
@@ -127,6 +133,9 @@ function book(seatId) {
 	sendRequest(book_url, "POST", body, null, bookCallback);
 }
 
+/**
+ * @param {Object} res 预约回调函数
+ */
 function bookCallback(res) {
 	uni.hideLoading()
 	if (res.status == "success") {
@@ -142,7 +151,7 @@ function bookCallback(res) {
 	
 	if(res.status == "fail") {
 		sleep(600);
-		bookFromFreeList()
+		bookFromFreeList();
 	}
 }
 
