@@ -230,21 +230,6 @@
 				}
 
 				if (res.status == "fail") {
-					// this.seatsIndex += 1;
-					// if (this.seatsIndex >= this.seatsCount) {
-					// 	uni.showToast({
-					// 		icon: 'none',
-					// 		title: "抢座失败，附近的座位也没了，请在看看别的吧",
-					// 		duration: 2000
-					// 	});
-					// 	return;
-					// }
-					// this.seat = this.seats[this.seatPicker[this.seatsIndex]]
-					// var that = this;
-					// setTimeout(function() {
-					// 	that.bookHandle();
-					// 	return;
-					// }, 500);
 					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
@@ -284,7 +269,7 @@
 				var date = new Date();
 				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 
-				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 500;
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 600;
 				
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
@@ -299,7 +284,7 @@
 				// 设置倒计时
 				this.intervalBtn = setInterval(() => {
 					nowTimeText = new Date().getTime();
-					console.info(nowTimeText);
+					
 					if (nowTimeText >= orderTime || this.countNum <= 1) {
 						
 						// 清除定时器
