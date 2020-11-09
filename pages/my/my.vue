@@ -66,12 +66,18 @@
 			this.pageInit();
 		},
 		
+		onPullDownRefresh() {
+			//监听下拉刷新动作的执行方法，每次手动下拉刷新都会执行一次
+			this.pageInit();
+		},
+		
 		methods: {
 			pageInit() {
 				sendRequest(usr_url, 'GET', null, null, this.callback);
 			},
 			
 			callback(res) {
+				uni.stopPullDownRefresh(); //停止下拉刷新动画
 				if(res.code == 12) {
 					this.removeUserInfo();
 					uni.reLaunch({
@@ -79,6 +85,10 @@
 					})
 					return;
 				}
+				uni.showToast({
+					icon: "none",
+					title: "刷新成功"
+				})
 				this.userInfo = res.data;
 			},
 			

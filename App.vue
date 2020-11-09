@@ -113,10 +113,6 @@
 			//#ifdef APP-PLUS  
 			var updateServer = "http://47.93.211.200:5000/update"; //检查更新地址
 
-			plus.runtime.getProperty(plus.runtime.appid, function(inf) {
-				uni.setStorageSync("wgt_version", inf.version);
-			});
-			console.info(uni.getStorageSync("wgt_version"))
 			var req = { //升级检测数据  
 				"appid": plus.runtime.appid,
 				"version": uni.getStorageSync("wgt_version"),
@@ -129,12 +125,14 @@
 				success: (res) => {
 					console.info(res);
 					var downloadUrl = res.data.url
+					this.appVersion = res.data.version
 					if (res.statusCode == 200 && res.data.status === 1) {
 						uni.showModal({ //提醒用户更新  
 							title: "更新提示",
 							content: res.data.msg,
 							success: (res) => {
 								if (res.confirm) {
+									var that = this
 									var dtask = plus.downloader.createDownload(
 										downloadUrl, {},
 										function(d, status) {
@@ -146,15 +144,28 @@
 											plus.nativeUI.closeWaiting();
 											// 下载完成
 											if (status == 200) {
-												uni.openDocument({
-													filePath: d.filename,
-													success: (res) => {
+												plus.runtime.install(
+													d.filename, {
+														force: true
+													},
+													function() {
+														uni.hideLoading();
+														uni.showToast({
+															icon: "none",
+															title: "安装完成，请重新打开",
+															duration: 1200,
+														})
+														uni.setStorageSync("wgt_version", that.appVersion);
+														plus.runtime.quit();
+													},
+													function(e) {
 														uni.showToast({
 															icon: 'none',
-															title: "正在打开下载的软件"
+															title: e
 														});
 													}
-												})
+												);
+
 											} else {
 												uni.showToast({
 													title: '更新失败-01',
@@ -215,8 +226,22 @@
 		},
 		onHide: function() {
 			console.log('App Hide')
+		},
+		
+		methods: {
+			// numberMillis 毫秒
+			sleep(numberMillis) {
+				var now = new Date();
+				var exitTime = now.getTime() + numberMillis;
+				while (true) {
+					now = new Date();
+					if (now.getTime() >= exitTime){
+						return;
+					}
+				}
+			}
 		}
-
+		
 	}
 </script>
 

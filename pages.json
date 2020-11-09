@@ -6,7 +6,9 @@
 			"style": {}
 		}, {
 			"path": "pages/my/my",
-			"style": {}
+			"style": {
+				"enablePullDownRefresh": true //设置为true表示当前页面开启下拉刷新
+			}
 		}, {
 			"path": "pages/book/book",
 			"style": {}
