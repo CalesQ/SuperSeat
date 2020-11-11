@@ -230,6 +230,7 @@
 				}
 
 				if (res.status == "fail") {
+					sleep(600)
 					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
@@ -269,7 +270,7 @@
 				var date = new Date();
 				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 
-				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 600;
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 500;
 				
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
@@ -313,7 +314,7 @@
 				uni.setStorageSync('expire_time', expireTime);
 				uni.showToast({
 					icon: "success",
-					title: "更新token成功",
+					title: "更新用户信息成功",
 					duration: 1200
 				})
 			},
