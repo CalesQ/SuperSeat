@@ -133,9 +133,9 @@
 				data: req,
 				success: (res) => {
 					console.info(res);
-					var downloadUrl = res.data.update_url
-					this.appVersion = res.data.app_version
-					if (res.statusCode == 200 && res.data.status === 101) {
+					var downloadUrl = res.data.data.update_url
+					this.appVersion = res.data.data.app_version
+					if (res.statusCode == 200 && res.data.code === 101) {
 						uni.showModal({ //提醒用户更新  
 							title: "更新提示",
 							content: res.data.msg,
