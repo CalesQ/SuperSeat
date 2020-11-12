@@ -1,3 +1,10 @@
+import {
+	recordLog_url
+} from "@/pages/common/js/url.js"
+
+/**
+ * 暂时保留 
+ */
 function writeLog(data = {}) {
 	uni.request({
 		url: "http:///47.93.211.200:5000/write/log/fail",
@@ -20,8 +27,36 @@ function writeLog(data = {}) {
 	})
 }
 
+function recordLog(operationType, message, status) {
+	var data = {
+		"operation_type": operationType,
+		"message": message,
+		"status": status
+	}
+	uni.request({
+		url: recordLog_url,
+		method: "POST",
+		data: data,
+		header: {
+			"Content-Type": "application/json",
+			"school_id": uni.getStorageSync("school_id"),
+			"app_id": plus.runtime.appid,
+		},
+		success(res) {
+			console.log(res);
+		},
+	
+		fail(res) {
+			console.log(res);
+		},
+	
+		complete() {
+		}
+	})
+}
+
 // 全局请求函数
-function sendRequest(url = '', method = 'GET', param = {}, header = null, callBack) {
+function sendRequest(url = '', method = 'GET', param = {}, header = null, callBack, operationType=null) {
 	if (header == null) {
 		console.info('set header', uni.getStorageSync('token'));
 		header = {
@@ -45,10 +80,18 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			console.log('request', res)
 			uni.hideLoading();
 			if (res.data.status == "success") {
-
+				
+				if (operationType != null) {
+					recordLog(operationType, "success", 1);
+				}
 				callBack(res.data)
 
 			} else if (res.data.status == "fail") {
+				
+				if (operationType != null) {
+					recordLog(operationType, res.data.message, 2);
+				}
+				
 				if (res.data.code == "1" && res.data.message == "预约失败，请尽快选择其他时段或座位") {
 					callBack(res.data);
 					return;
@@ -62,22 +105,21 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 					callBack(res.data);
 				}
 			} else if (res.statusCode == 403) {
+				
+				if (operationType != null) {
+					recordLog(operationType, "403", 0);
+				}
+				
 				uni.showToast({
 					icon: 'none',
 					title: '请重新登录',
 				});
 			} else {
-				var date = new Date();
-				var createTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() +
-					':' + date.getMinutes();
-				var data = {
-					"user_id": uni.getStorageSync("school_id"),
-					"log": res,
-					"create_time": createTime
+				
+				if (operationType != null) {
+					recordLog(operationType, res.statusCode + " " + res.data, 0);
 				}
-
-				writeLog(data);
-
+				
 				uni.showToast({
 					icon: 'none',
 					title: '请求错误，请稍后重试',
@@ -89,7 +131,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			console.log(res);
 			uni.showToast({
 				icon: 'none',
-				title: '网络错误，请稍后重试',
+				title: '网络错误，请稍后查看网络',
 			});
 		},
 
@@ -97,4 +139,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 	});
 }
 
-export default sendRequest
+export {
+	recordLog,
+	sendRequest
+};

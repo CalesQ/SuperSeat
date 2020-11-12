@@ -4,11 +4,11 @@
 			<block slot="content">预约记录</block>
 		</cu-custom>
 		<view v-show="reservationsList.length == 0 && historyList.length == 0" class="grid margin-bottom text-center col-1">
-			<view class="padding" >无预约记录</view>
+			<view class="padding">无预约记录</view>
 		</view>
 		<!-- 预约记录 -->
-		<scroll-view v-show="!isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
-		 :enable-back-to-top="true">
+		<scroll-view v-show="!isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]"
+		 :scroll-with-animation="true" :enable-back-to-top="true">
 			<block v-for="(item,index) in reservationsList" :key="index">
 				<view class="cu-card case">
 					<view class="cu-item shadow">
@@ -44,10 +44,10 @@
 				</view>
 			</block>
 		</scroll-view>
-		
+
 		<!-- 历史记录 -->
-		<scroll-view v-show="isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]" :scroll-with-animation="true"
-		 :enable-back-to-top="true">
+		<scroll-view v-show="isHistory" scroll-y class="indexes" :style="[{height:'calc(100vh - '+ CustomBar + 'px)'}]"
+		 :scroll-with-animation="true" :enable-back-to-top="true">
 			<block v-for="(item,index) in historyList" :key="index">
 				<view class="cu-card case">
 					<view class="cu-item shadow">
@@ -94,7 +94,10 @@
 	import {
 		getNowTimeYDSText
 	} from '@/pages/common/js/timeUtil.js'
-	import sendRequest from '@/pages/common/js/sendRequest.js'
+
+	import {
+		sendRequest
+	} from '@/pages/common/js/sendRequest.js'
 
 	export default {
 		data() {
@@ -107,7 +110,7 @@
 		},
 
 		onLoad(options) {
-			if(getNowTimeYDSText() > this.divTime) {
+			if (getNowTimeYDSText() > this.divTime) {
 				this.isHistory = true;
 				// 获取的是历史记录
 				this.initHistory();
@@ -118,9 +121,9 @@
 		},
 
 		onShow(options) {
-			if(uni.getStorageSync("history_update")) {
+			if (uni.getStorageSync("history_update")) {
 				uni.setStorageSync("history_update", false);
-				if(getNowTimeYDSText() > this.divTime) {
+				if (getNowTimeYDSText() > this.divTime) {
 					this.isHistory = true;
 					// 获取的是历史记录
 					this.initHistory();
@@ -133,7 +136,7 @@
 
 		onPullDownRefresh() {
 			//监听下拉刷新动作的执行方法，每次手动下拉刷新都会执行一次
-			if(getNowTimeYDSText() > this.divTime) {
+			if (getNowTimeYDSText() > this.divTime) {
 				this.isHistory = true;
 				// 获取的是历史记录
 				this.initHistory();
@@ -151,13 +154,13 @@
 				uni.showLoading({
 					title: "正在获取预约记录"
 				})
-				sendRequest(reservations_url, "GET", null, null, this.initCallback)
+				sendRequest(reservations_url, "GET", null, null, this.initCallback, null)
 			},
 
 			initCallback(res) {
 				uni.hideLoading();
-				
-				if(res.code == 12) {
+
+				if (res.code == 12) {
 					uni.removeStorageSync("token");
 					uni.removeStorageSync("expire_time");
 					uni.removeStorageSync("pwd");
@@ -166,14 +169,14 @@
 					})
 					return;
 				}
-				
-				
-				if(this.isHistory) {
+
+
+				if (this.isHistory) {
 					// 历史记录
-					this.historyList = res.data.reservations == null ? [] : res.data.reservations;					
+					this.historyList = res.data.reservations == null ? [] : res.data.reservations;
 				} else {
 					// 预约记录
-					this.reservationsList = res.data == null ? [] : res.data;					
+					this.reservationsList = res.data == null ? [] : res.data;
 				}
 				uni.stopPullDownRefresh(); //停止下拉刷新动画
 			},
@@ -185,8 +188,8 @@
 				uni.showLoading({
 					title: "正在获取历史记录"
 				})
-				sendRequest(history_url, "GET", null, null, this.initCallback)
-			},			
+				sendRequest(history_url, "GET", null, null, this.initCallback, null)
+			},
 
 			/**
 			 * 取消/结束操作事件
@@ -198,8 +201,9 @@
 					title: "正在取消"
 				})
 				var url = index > -1 ? (cancel_url + this.reservationsList[index].id) : stop_url;
-
-				sendRequest(url, "GET", null, null, this.opCallback);
+				var type = index > -1 ? "cancel" : "stop"
+				
+				sendRequest(url, "GET", null, null, this.opCallback, type);
 			},
 
 			opCallback(res) {

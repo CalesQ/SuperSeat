@@ -26,7 +26,9 @@
 	import {
 		login_url
 	} from '@/pages/common/js/url.js'
-	import sendRequest from '@/pages/common/js/sendRequest.js'
+	import {
+		sendRequest
+	} from '@/pages/common/js/sendRequest.js'
 
 	export default {
 		data() {
@@ -77,7 +79,7 @@
 					mask: true,
 					title: "正在登录"
 				});
-				sendRequest(requestUrl, 'GET', null, null, this.callback);
+				sendRequest(requestUrl, 'GET', null, null, this.callback, null);
 			},
 
 			callback(res) {

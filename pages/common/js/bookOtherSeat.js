@@ -3,7 +3,9 @@ import {
 	book_url
 } from "@/pages/common/js/url.js"
 
-import sendRequest from "@/pages/common/js/sendRequest.js"
+import {
+	sendRequest
+} from "@/pages/common/js/sendRequest.js"
 
 
 var freeSeatIdList = []
@@ -25,7 +27,7 @@ function bookOther(roomId, buildingId, start, end, d) {
 	startTime = start;
 	endTime = end;
 	date = d;
-	
+
 	hasSeat = false;
 	var header = {
 		'Accept': '*/*',
@@ -55,7 +57,7 @@ function bookOther(roomId, buildingId, start, end, d) {
 		header: header,
 		data: body,
 		success: (res) => {
-			
+
 			if (res.data.status == true) {
 				var seatDic = res.data.data.seats;
 				for (var key in seatDic) {
@@ -93,7 +95,7 @@ function sleep(numberMillis) {
 	var exitTime = now.getTime() + numberMillis;
 	while (true) {
 		now = new Date();
-		if (now.getTime() >= exitTime){
+		if (now.getTime() >= exitTime) {
 			return;
 		}
 	}
@@ -108,12 +110,12 @@ function bookFromFreeList() {
 		title: "正在抢周围的座位"
 	})
 	seatIndex += 1;
-	
-	if(seatIndex >= seatListSize) {
+
+	if (seatIndex >= seatListSize) {
 		return;
 	}
 	var id = freeSeatIdList[seatIndex]
-	
+
 	book(id);
 }
 
@@ -129,7 +131,7 @@ function book(seatId) {
 		"date": date,
 		"t2": "2",
 	}
-	
+
 	sendRequest(book_url, "POST", body, null, bookCallback);
 }
 
@@ -148,8 +150,8 @@ function bookCallback(res) {
 			url: "@/pages/history/history.vue"
 		})
 	}
-	
-	if(res.status == "fail") {
+
+	if (res.status == "fail") {
 		sleep(600);
 		bookFromFreeList();
 	}

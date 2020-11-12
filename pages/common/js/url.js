@@ -14,7 +14,9 @@
 // export const cancel_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/"; // 取消预约API + 预约ID
 // export const stop_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/stop"; // 座位释放API  不需要其它ID
 // export const reservations_url = "https://seat.lib.whu.edu.cn:8443/rest/v2/user/reservations"
-
+/**
+ * 图书馆
+ */
 export const login_url = "https://seat.lib.whu.edu.cn/rest/auth"; //登录API
 export const stats_url = "https://seat.lib.whu.edu.cn/rest/v2/room/stats2/"; // +信息分馆区域信息API  信息馆ID1
 export const layout_url = "https://seat.lib.whu.edu.cn/rest/v2/room/layoutByDate/"; // 某区域座位信息 +6:三楼西区域 后面还有yyyy-mm-dd时间
@@ -28,3 +30,9 @@ export const cancel_url = "https://seat.lib.whu.edu.cn/rest/v2/cancel/"; // 取�
 export const stop_url = "https://seat.lib.whu.edu.cn/rest/v2/stop"; // 座位释放API  不需要其它ID
 export const reservations_url = "https://seat.lib.whu.edu.cn/rest/v2/user/reservations"
 
+/**
+ * 系统
+ */
+const domain = "http://47.93.211.200:5000"
+export const recordLog_url = domain + "/v1/log/record"
+export const checkUpdate_url = domain + "/v1/appupdate/version"

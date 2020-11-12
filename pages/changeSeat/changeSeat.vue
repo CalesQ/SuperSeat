@@ -41,7 +41,14 @@
 		getTimeFromTimeText,
 		getNowTimeText
 	} from "@/pages/common/js/timeUtil.js"
-	import sendRequest from "@/pages/common/js/sendRequest.js"
+
+	import {
+		sleep
+	} from "@/pages/common/js/bookOtherSeat.js"
+
+	import {
+		sendRequest
+	} from "@/pages/common/js/sendRequest.js"
 
 	export default {
 		data() {
@@ -121,21 +128,22 @@
 
 					// 选择操作地址
 					var opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
-
+					var type = this.status == "RESERVE" ? "cancel" : "stop";
+					
 					// 检查 token 是否过期
 					if (uni.getStorageSync("expire_time") < new Date().getTime()) {
 						// 重新登录，更新 token
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
 						console.info("更新token")
-						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback)
+						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null)
 
 						// 阻塞3秒等待更新
-						setTimeout(function() {
-							sendRequest(opUrl, "GET", null, null, this.endUseCallback);
-						}, 3000);
+						sleep(3000);
+						sendRequest(opUrl, "GET", null, null, this.endUseCallback, type);
+				
 					} else {
-						sendRequest(opUrl, "GET", null, null, this.endUseCallback);
+						sendRequest(opUrl, "GET", null, null, this.endUseCallback, type);
 					}
 				}
 			},
@@ -171,7 +179,7 @@
 				}
 				console.info(data);
 
-				sendRequest(book_url, "POST", data, null, this.bookCallback);
+				sendRequest(book_url, "POST", data, null, this.bookCallback, "change");
 			},
 
 			bookCallback(res) {

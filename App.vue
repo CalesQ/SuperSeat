@@ -1,5 +1,12 @@
 <script>
 	import Vue from 'vue'
+	import {
+		recordLog
+	} from "@/pages/common/js/sendRequest.js"
+	
+	import {
+		checkUpdate_url
+	} from "@/pages/common/js/url.js"
 	export default {
 
 		data() {
@@ -111,22 +118,24 @@
 
 			//在线更新
 			//#ifdef APP-PLUS  
-			var updateServer = "http://47.93.211.200:5000/update"; //检查更新地址
-
+			
 			var req = { //升级检测数据  
-				"appid": plus.runtime.appid,
 				"version": uni.getStorageSync("wgt_version"),
-				"userid": uni.getStorageSync("school_id")
 			};
 
 			uni.request({
-				url: updateServer,
+				url: checkUpdate_url,
+				header: {
+					"Content-Type": "application/json",
+					"school_id": uni.getStorageSync("school_id"),
+					"app_id": plus.runtime.appid
+				},
 				data: req,
 				success: (res) => {
 					console.info(res);
-					var downloadUrl = res.data.url
-					this.appVersion = res.data.version
-					if (res.statusCode == 200 && res.data.status === 1) {
+					var downloadUrl = res.data.update_url
+					this.appVersion = res.data.app_version
+					if (res.statusCode == 200 && res.data.status === 101) {
 						uni.showModal({ //提醒用户更新  
 							title: "更新提示",
 							content: res.data.msg,
@@ -155,6 +164,7 @@
 															title: "安装完成，请重新打开",
 															duration: 1200,
 														})
+														recordLog("app_update", "更新成功", 1);
 														uni.setStorageSync("wgt_version", that.appVersion);
 														plus.runtime.quit();
 													},
@@ -167,6 +177,7 @@
 												);
 
 											} else {
+												recordLog("app_update", "更新失败-01", 0);
 												uni.showToast({
 													title: '更新失败-01',
 													duration: 1500
@@ -206,6 +217,7 @@
 										});
 									} catch (err) {
 										plus.nativeUI.closeWaiting();
+										recordLog("app_update", "更新失败-02", 0)
 										uni.showToast({
 											title: '更新失败-02',
 											mask: false,
