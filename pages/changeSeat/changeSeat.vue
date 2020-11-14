@@ -68,7 +68,9 @@
 
 				// 取消参数
 				"reserveId": "",
-				"status": ""
+				"status": "",
+				
+				"opUrl" = ""
 			}
 		},
 
@@ -127,7 +129,7 @@
 					}
 
 					// 选择操作地址
-					var opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
+					this.opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
 					var type = this.status == "RESERVE" ? "cancel" : "stop";
 					
 					// 检查 token 是否过期
@@ -137,13 +139,9 @@
 							"pwd");
 						console.info("更新token")
 						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null)
-
-						// 阻塞3秒等待更新
-						sleep(3000);
-						sendRequest(opUrl, "GET", null, null, this.endUseCallback, type);
 				
 					} else {
-						sendRequest(opUrl, "GET", null, null, this.endUseCallback, type);
+						sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, type);
 					}
 				}
 			},
@@ -158,11 +156,13 @@
 					title: "更新token成功",
 					duration: 1500
 				})
+				
+				sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, type);
 			},
 
 			endUseCallback(res) {
 				console.info("success to end use.");
-
+				
 				// 预约新的时间段
 				this.bookNewTimeHandle();
 			},
@@ -170,14 +170,12 @@
 			// 预约新的时间段
 			bookNewTimeHandle() {
 				var data = {
-					"t": "1",
-					"startTime": this.startTime,
-					"endTime": this.endTime,
+					"startTime": this.startTime.toString(),
+					"endTime": this.endTime.toString(),
 					"seat": this.seat.toString(),
 					"date": this.date,
-					"t2": "2",
+					"token": uni.getStorageSync('token')
 				}
-				console.info(data);
 
 				sendRequest(book_url, "POST", data, null, this.bookCallback, "change");
 			},
