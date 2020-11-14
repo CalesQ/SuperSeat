@@ -22,7 +22,25 @@
 			"style": {}
 
 		}
-	],
+	    ,{
+            "path" : "pages/normalBook/normalBook",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/bookIndex/bookIndex",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 
 	"tabBar": {
 		"color": "#8a8a8a",
@@ -30,7 +48,7 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-				"pagePath": "pages/book/book",
+				"pagePath": "pages/bookIndex/bookIndex",
 				"text": "预约",
 				"iconPath": "static/tabbar/component.png",
 				"selectedIconPath": "static/tabbar/component_cur.png"

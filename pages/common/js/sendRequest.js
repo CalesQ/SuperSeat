@@ -1,5 +1,6 @@
 import {
-	recordLog_url
+	recordLog_url,
+	book_url
 } from "@/pages/common/js/url.js"
 
 /**
@@ -63,13 +64,15 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			'Accept': '*/*',
 			'Accept-Encoding': 'gzip, deflate, br',
 			'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-			'Connection': 'keep-alive',
+			//'Connection': 'keep-alive',
+			'Connection': 'close',
 			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 			'Host': 'seat.lib.whu.edu.cn:8443',
 			'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 			'token': uni.getStorageSync('token')
 		}
 	}
+	
 	uni.request({
 		url: url,
 		method: method,
@@ -79,7 +82,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 		success: (res) => {
 			console.log('request', res)
 			uni.hideLoading();
-			if (res.data.status == "success") {
+			if (res.data.status == "success" || res.data.status == true) {
 				
 				if (operationType != null) {
 					recordLog(operationType, "success", 1);

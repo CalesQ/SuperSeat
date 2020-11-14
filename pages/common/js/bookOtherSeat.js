@@ -34,6 +34,7 @@ function bookOther(roomId, buildingId, start, end, d) {
 		'Accept-Encoding': 'gzip, deflate, br',
 		'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
 		'Connection': 'keep-alive',
+		//'Connection': 'close',
 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 		'Host': 'seat.lib.whu.edu.cn:8443',
 		'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
@@ -60,6 +61,7 @@ function bookOther(roomId, buildingId, start, end, d) {
 
 			if (res.data.status == true) {
 				var seatDic = res.data.data.seats;
+				console.log(seatDic)
 				for (var key in seatDic) {
 					if (seatDic[key].type == "seat") {
 						freeSeatIdList.push(seatDic[key].id.toString())
@@ -112,6 +114,10 @@ function bookFromFreeList() {
 	seatIndex += 1;
 
 	if (seatIndex >= seatListSize) {
+		uni.showToast({
+			icon: "none",
+			title: "已经抢座"+ seatIndex +"次，附近已无同类座位"
+		})
 		return;
 	}
 	var id = freeSeatIdList[seatIndex]
@@ -124,15 +130,17 @@ function bookFromFreeList() {
  */
 function book(seatId) {
 	var body = {
-		"t": "1",
-		"startTime": startTime,
-		"endTime": endTime,
+		"startTime": startTime.toString(),
+		"endTime": endTime.toString(),
 		"seat": seatId.toString(),
 		"date": date,
-		"t2": "2",
+		"token": uni.getStorageSync('token')
 	}
-
-	sendRequest(book_url, "POST", body, null, bookCallback);
+	uni.showToast({
+		icon: "none",
+		title: "已经抢座"+ seatIndex +"次"
+	})
+	sendRequest(book_url, "POST", body, null, bookCallback, "book");
 }
 
 /**
@@ -147,12 +155,12 @@ function bookCallback(res) {
 		})
 		uni.setStorageSync("history_update", true)
 		uni.switchTab({
-			url: "@/pages/history/history.vue"
+			url: "/pages/history/history.vue"
 		})
 	}
 
 	if (res.status == "fail") {
-		sleep(600);
+		sleep(500);
 		bookFromFreeList();
 	}
 }

@@ -29,6 +29,11 @@ export const usr_url = "https://seat.lib.whu.edu.cn/rest/v2/user"; // 用户信�
 export const cancel_url = "https://seat.lib.whu.edu.cn/rest/v2/cancel/"; // 取消预约API + 预约ID
 export const stop_url = "https://seat.lib.whu.edu.cn/rest/v2/stop"; // 座位释放API  不需要其它ID
 export const reservations_url = "https://seat.lib.whu.edu.cn/rest/v2/user/reservations"
+export const new_search_url = "https://seat.lib.whu.edu.cn/freeBook/ajaxSearch" // get方法
+
+export const all_room_url = "https://seat.lib.whu.edu.cn/rest/v2/free/filters" // 所有场馆信息 GET
+export const violation_url = "https://seat.lib.whu.edu.cn/rest/v2/violations" // 违规信息 GET
+
 
 /**
  * 系统

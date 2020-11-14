@@ -28,10 +28,6 @@
 							<view class="title">状态:</view>
 							<view class="title">{{changeType(item.status)}}</view>
 						</view>
-						<!-- <view class="cu-form-group">
-							<view class="title">消息:</view>
-							<view class="title">{{item.message}}</view>
-						</view> -->
 						<view v-show="item.status == 'RESERVE'" class="cu-form-group">
 							<button @click="opHandle(index)" class="cu-btn round sm bg-red">取消</button>
 							<button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button>
@@ -70,12 +66,10 @@
 						<view v-show="item.stat == 'RESERVE'" class="cu-form-group">
 							<button @click="opHandle(index)" class="cu-btn round sm bg-red">取消</button>
 							<view class="title">次日凌晨01:00起才可改签</view>
-							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
 						</view>
 						<view v-show="item.stat == 'CHECK_IN' || item.stat == 'AWAY'" class="cu-form-group">
 							<button @click="opHandle(-1)" class="cu-btn round sm bg-red">结束</button>
 							<view class="title">次日凌晨01:00起才可改签</view>
-							<!-- <button @click="changeSeat(index)" class="cu-btn round sm bg-green">改签</button> -->
 						</view>
 					</view>
 				</view>
@@ -197,10 +191,24 @@
 			 * @param {Object} index 事件类型标志
 			 */
 			opHandle(index) {
+				
+				if(getNowTimeYDSText() < "01:00:00") {
+					uni.showToast({
+						icon: "none",
+						title: "1:00之后可取消"
+					})
+					return;
+				}
+				
 				uni.showLoading({
 					title: "正在取消"
 				})
-				var url = index > -1 ? (cancel_url + this.reservationsList[index].id) : stop_url;
+				var url = "";
+				if (getNowTimeYDSText() > this.divTime) {
+					url = index > -1 ? (cancel_url + this.historyList[index].id) : stop_url;
+				} else {
+					url = index > -1 ? (cancel_url + this.reservationsList[index].id) : stop_url;
+				}
 				var type = index > -1 ? "cancel" : "stop"
 				
 				sendRequest(url, "GET", null, null, this.opCallback, type);
@@ -208,10 +216,16 @@
 
 			opCallback(res) {
 				var that = this;
+				this.historyList = [];
+				this.reservationsList = [];
 				uni.showToast({
 					title: "操作成功",
 					complete() {
-						that.init();
+						if(that.isHistory) {
+							that.initHistory();
+						} else {
+							that.init();
+						}
 					}
 				})
 			},

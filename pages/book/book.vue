@@ -1,14 +1,15 @@
 <template>
 	<view>
-		<cu-custom bgColor="bg-gradual-blue" :isBack="false">
-			<block slot="content">预约</block>
+		<cu-custom bgColor="bg-gradual-blue" :isBack="true">
+			<block slot="backText">返回</block>
+			<block slot="content">抢座</block>
 		</cu-custom>
 		<view class="bg-white padding">
 			<!-- <view class="grid margin-bottom text-center">
 				限信息学部图书馆, 每日22:40后预约第二天，22:40前预约当前。抢座时请勿退出软件。
 			</view> -->
 			<view class="grid margin-bottom text-center">
-				限信息学部图书馆使用，现只用于每日22:40后预约第二天的座位。抢座时请勿退出软件。
+				限信息学部图书馆使用，现用于每日22:40后预约第二天的座位。抢座时请勿退出软件。
 			</view>
 		</view>
 		<view class="cu-form-group margin-top">
@@ -233,7 +234,7 @@
 				}
 
 				if (res.status == "fail") {
-					sleep(600)
+					sleep(500)
 					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
@@ -253,12 +254,11 @@
 			bookHandle() {
 				uni.hideLoading();
 				var body = {
-					"t": "1",
 					"startTime": this.start.toString(),
 					"endTime": this.end.toString(),
 					"seat": this.seat.toString(),
 					"date": this.date,
-					"t2": "2",
+					"token": uni.getStorageSync('token')
 				}
 				console.info(body);
 				uni.showLoading({
@@ -274,7 +274,7 @@
 				var date = new Date();
 				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 
-				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 500;
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 600;
 
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
@@ -317,7 +317,7 @@
 				var expireTime = new Date().getTime() + 10 * 60 * 1000;
 				uni.setStorageSync('expire_time', expireTime);
 				uni.showToast({
-					icon: "success",
+					icon: "none",
 					title: "更新用户信息成功",
 					duration: 1200
 				})

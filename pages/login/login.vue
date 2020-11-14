@@ -73,13 +73,17 @@
 			},
 
 			login() {
-				var requestUrl = login_url + "?username=" + this.schoolId + "&password=" + this.pwd;
+				var requestUrl = login_url;
 				console.info(requestUrl);
 				uni.showLoading({
 					mask: true,
 					title: "正在登录"
 				});
-				sendRequest(requestUrl, 'GET', null, null, this.callback, null);
+				var param = {
+					"username": this.schoolId,
+					"password": this.pwd
+				}
+				sendRequest(requestUrl, 'GET', param, null, this.callback, null);
 			},
 
 			callback(res) {
