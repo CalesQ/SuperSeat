@@ -15,6 +15,10 @@
 </template>
 
 <script>
+	import {
+		getNowTimeYDSText
+	} from "@/pages/common/js/timeUtil.js"
+	
 	export default {
 		data() {
 			return {
@@ -34,6 +38,15 @@
 			},
 			
 			toRushBook() {
+				
+				if(getNowTimeYDSText() < "22:40:00") {
+					uni.showToast({
+						icon: "none",
+						title: "22:40:00后开始抢座"
+					})
+					return;
+				}
+				
 				uni.navigateTo({
 					url: "/pages/book/book"
 				})
