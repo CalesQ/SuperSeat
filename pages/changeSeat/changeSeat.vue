@@ -137,7 +137,6 @@
 						// 重新登录，更新 token
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						console.info("更新token")
 						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null)
 				
 					} else {
@@ -153,7 +152,7 @@
 				uni.setStorageSync('expire_time', expireTime);
 				uni.showToast({
 					icon: "none",
-					title: "更新token成功",
+					title: "重新登录成功",
 					duration: 1500
 				})
 				
