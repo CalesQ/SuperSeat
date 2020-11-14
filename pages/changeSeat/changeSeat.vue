@@ -70,7 +70,8 @@
 				"reserveId": "",
 				"status": "",
 				
-				"opUrl" = ""
+				"opUrl" = "",
+				"type" = ""
 			}
 		},
 
@@ -130,7 +131,7 @@
 
 					// 选择操作地址
 					this.opUrl = this.status == "RESERVE" ? cancel_url + this.reserveId : stop_url;
-					var type = this.status == "RESERVE" ? "cancel" : "stop";
+					this.type = this.status == "RESERVE" ? "cancel" : "stop";
 					
 					// 检查 token 是否过期
 					if (uni.getStorageSync("expire_time") < new Date().getTime()) {
@@ -140,7 +141,7 @@
 						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null)
 				
 					} else {
-						sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, type);
+						sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, this.type);
 					}
 				}
 			},
@@ -156,7 +157,7 @@
 					duration: 1500
 				})
 				
-				sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, type);
+				sendRequest(this.opUrl, "GET", null, null, this.endUseCallback, this.type);
 			},
 
 			endUseCallback(res) {
