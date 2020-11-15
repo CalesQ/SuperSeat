@@ -19,11 +19,17 @@ var seatIndex = -1
 var startTime = ""
 var endTime = ""
 var date = ""
+var rushBookTime = 1
 
 /**
  * 查询指定时间内指定房间内的空余座位，若有则直接预约，没有则根据条件约其他的座位
  */
 function bookOther(roomId, buildingId, start, end, d) {
+	uni.showLoading({
+		mask: true,
+		title: "正在抢周边座位"
+	})
+	
 	startTime = start;
 	endTime = end;
 	date = d;
@@ -36,18 +42,16 @@ function bookOther(roomId, buildingId, start, end, d) {
 		'Connection': 'keep-alive',
 		//'Connection': 'close',
 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-		'Host': 'seat.lib.whu.edu.cn:8443',
+		'Host': 'seat.lib.whu.edu.cn',
 		'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 		'token': uni.getStorageSync('token')
 	}
 
 	var body = {
-		"t": "1",
 		"roomId": roomId,
 		"buildingId": buildingId,
 		"batch": "9999",
 		"page": "1",
-		"t2": "2",
 	}
 
 	var searchUrl = search_url + date + "/" + startTime + "/" + endTime;
@@ -107,10 +111,6 @@ function sleep(numberMillis) {
  * 预约空座位
  */
 function bookFromFreeList() {
-	uni.showLoading({
-		mask: true,
-		title: "正在抢周围的座位"
-	})
 	seatIndex += 1;
 
 	if (seatIndex >= seatListSize) {
@@ -136,19 +136,24 @@ function book(seatId) {
 		"date": date,
 		"token": uni.getStorageSync('token')
 	}
-	uni.showToast({
-		icon: "none",
-		title: "已经抢座"+ seatIndex +"次"
-	})
-	sendRequest(book_url, "POST", body, null, bookCallback, "book");
+	sendRequest(book_url, "POST", body, null, bookCallback, "book_other");
 }
+
+
 
 /**
  * @param {Object} res 预约回调函数
  */
 function bookCallback(res) {
-	uni.hideLoading()
+	
+	if(res.statusCode != undefined && res.statusCode == 400 && rushBookTime > 0) {
+		rushBookTime = rushBookTime - 1;
+		book()
+		return;
+	}
+	
 	if (res.status == "success") {
+		uni.hideLoading();
 		hasSeat = true;
 		uni.showToast({
 			title: "抢座成功"

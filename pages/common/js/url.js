@@ -41,3 +41,4 @@ export const violation_url = "https://seat.lib.whu.edu.cn/rest/v2/violations" //
 const domain = "http://47.93.211.200:5000"
 export const recordLog_url = domain + "/v1/log/record"
 export const checkUpdate_url = domain + "/v1/appupdate/version"
+export const appData_url = domain + "/v1/daily/data"

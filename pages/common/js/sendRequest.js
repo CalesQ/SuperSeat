@@ -3,6 +3,10 @@ import {
 	book_url
 } from "@/pages/common/js/url.js"
 
+import {
+	sleep
+} from "@/pages/common/js/bookOtherSeat.js"
+
 /**
  * 暂时保留 
  */
@@ -64,15 +68,14 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			'Accept': '*/*',
 			'Accept-Encoding': 'gzip, deflate, br',
 			'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-			//'Connection': 'keep-alive',
-			'Connection': 'close',
+			'Connection': 'keep-alive',
 			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-			'Host': 'seat.lib.whu.edu.cn:8443',
+			'Host': 'seat.lib.whu.edu.cn',
 			'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 			'token': uni.getStorageSync('token')
 		}
 	}
-	
+	var that = this;
 	uni.request({
 		url: url,
 		method: method,
@@ -92,7 +95,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 			} else if (res.data.status == "fail") {
 				
 				if (operationType != null) {
-					recordLog(operationType, res.data.message, 2);
+					recordLog(operationType, res.data.code + " " +res.data.message, 2);
 				}
 				
 				if (res.data.code == "1" && res.data.message == "预约失败，请尽快选择其他时段或座位") {
@@ -118,6 +121,12 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 					title: '请重新登录',
 				});
 			} else {
+				// 400  直接重试
+				if(res.statusCode == 400 && url == book_url) {
+					sleep(200);
+					callBack(res);
+					return;
+				}
 				
 				if (operationType != null) {
 					recordLog(operationType, res.statusCode + " " + res.data, 0);

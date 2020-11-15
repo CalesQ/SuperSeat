@@ -127,10 +127,16 @@
 				"countNum": 0,
 				"checkFlag": true,
 				"bookOtherFlag": false,
+				
+				
+				"rushBookTime": 2
 			}
 		},
 
 		methods: {
+			/**
+			 * 检查当前时间
+			 */
 			checkTime() {
 				var nowTime = getNowTimeYDSText();
 
@@ -145,7 +151,12 @@
 
 				this.checkFlag = false;
 			},
-
+			
+			/**
+			 * 获取房间信息
+			 * 
+			 * @param {Object} e
+			 */
 			roomPickerChange(e) {
 				this.roomIndex = e.target.value;
 				var roomName = this.roomPicker[e.target.value];
@@ -159,12 +170,21 @@
 				console.info(newUrl, uni.getStorageSync('token'))
 				sendRequest(newUrl, 'GET', null, null, this.callback, null)
 			},
-
+			/**
+			 * 获取房间信息回调函数
+			 * 
+			 * @param {Object} res
+			 */
 			callback(res) {
 				console.info(res);
 				this.dealWithRes(res);
 			},
-
+			
+			/**
+			 * 获取房间信息回调数据处理
+			 * 
+			 * @param {Object} res
+			 */
 			dealWithRes(res) {
 				this.seats = {}
 				var layout = res.data.layout;
@@ -181,6 +201,9 @@
 				console.info(this.seatPicker);
 			},
 
+			/**
+			 * 抢座按钮点击处理函数
+			 */
 			bookSeat() {
 
 				if (this.seatIndex == -1) {
@@ -225,14 +248,31 @@
 				}
 			},
 
+			/**
+			 * 时间到，初次处理回调函数
+			 * 
+			 * @param {Object} res
+			 */
 			bookCallback(res) {
+				
+				if(res.statusCode != undefined && res.statusCode == 400 && this.rushBookTime > 0) {
+					this.rushBookTime = this.rushBookTime - 1;
+					bookHandle()
+					return;
+				}
+				
 				if (res.code == 12) {
+					uni.showLoading({
+						mask: true,
+						title: "正在重新登录"
+					})
 					var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 						"pwd");
-					sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null);
-					sleep(2000)
+					sendRequest(loginUrl, 'GET', null, null, this.AfterTimeGetTokenCallback, "after_time_login");
+					return;
 				}
-
+				
+				// 预约失败，约周围
 				if (res.status == "fail") {
 					sleep(500)
 					bookOther(this.room, "1", this.start, this.end, this.date);
@@ -251,6 +291,9 @@
 				})
 			},
 
+			/**
+			 * 倒计时结束，抢座处理函数
+			 */
 			bookHandle() {
 				uni.hideLoading();
 				var body = {
@@ -268,13 +311,15 @@
 				sendRequest(book_url, "POST", body, null, this.bookCallback, "book");
 			},
 
-			// 倒计时
+			/**
+			 * 倒计时
+			 */
 			countDown() {
 
 				var date = new Date();
 				var todayOrderTimeText = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 
-				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 600;
+				var orderTime = (new Date(todayOrderTimeText + " 22:44:59")).getTime() + 500;
 
 				// 设置medel倒计时时显示的信息
 				this.modelShowMag = this.countNum + " S";
@@ -304,7 +349,7 @@
 					if (this.countNum == 75) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, null)
+						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, "reget_token")
 					}
 
 					this.modelShowMag = parseFloat(this.countNum / 5) + "\tS";
@@ -312,6 +357,11 @@
 				}, 200);
 			},
 
+			/**
+			 * 22:44:45 重新登录
+			 * 
+			 * @param {Object} res
+			 */
 			reGetTokenCallback(res) {
 				uni.setStorageSync('token', res.data.token);
 				var expireTime = new Date().getTime() + 10 * 60 * 1000;
@@ -337,6 +387,25 @@
 				this.endTimeIndex = e.target.value;
 				this.end = endTime[this.endPicker[e.target.value]]
 			},
+			
+			/**
+			 * 22:45后密码错误重新登录回调函数
+			 * 
+			 * @param {Object} res
+			 */
+			AfterTimeGetTokenCallback(res) {
+				uni.hideLoading();
+				uni.setStorageSync('token', res.data.token);
+				var expireTime = new Date().getTime() + 10 * 60 * 1000;
+				uni.setStorageSync('expire_time', expireTime);
+				uni.showToast({
+					icon: "none",
+					title: "更新用户信息成功",
+					duration: 1200
+				})
+				
+				bookOther(this.room, "1", this.start, this.end, this.date);
+			}
 		}
 	}
 </script>
