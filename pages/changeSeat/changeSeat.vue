@@ -70,8 +70,8 @@
 				"reserveId": "",
 				"status": "",
 				
-				"opUrl" = "",
-				"type" = ""
+				"opUrl": "",
+				"type": ""
 			}
 		},
 

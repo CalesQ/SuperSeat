@@ -40,6 +40,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/admin/admin",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 
 	"tabBar": {
