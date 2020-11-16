@@ -63,18 +63,37 @@ function recordLog(operationType, message, status) {
 // 全局请求函数
 function sendRequest(url = '', method = 'GET', param = {}, header = null, callBack, operationType=null) {
 	if (header == null) {
-		console.info('set header', uni.getStorageSync('token'));
-		header = {
-			'Accept': '*/*',
-			'Accept-Encoding': 'gzip, deflate, br',
-			'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-			'Connection': 'keep-alive',
-			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-			'Host': 'seat.lib.whu.edu.cn',
-			'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
+		var timestamps = (new Date()).valueOf();
+		if (method == "GET") {
+			header = {
+				'Accept': '*/*',
+				'Accept-Encoding': 'gzip',
+				'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+				'Host': 'seat.lib.whu.edu.cn:8443',
+				'User-Agent': "Dart/2.5（dart.io）",
+				'x-request-date': timestamps
+			}
+		} else {
+			header = {
+				//'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
+				'Accept': '*/*',
+				'Accept-Encoding': 'gzip',
+				'transfer-encoding': 'chunked',
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+				'Host': 'seat.lib.whu.edu.cn:8443',
+				'User-Agent': "Dart/2.5（dart.io）",
+				'x-request-date': timestamps
+			}
+		}
+		
+	}
+	
+	if (param == null) {
+		param = {
 			'token': uni.getStorageSync('token')
 		}
 	}
+	
 	var that = this;
 	uni.request({
 		url: url,
