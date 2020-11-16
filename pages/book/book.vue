@@ -127,8 +127,8 @@
 				"countNum": 0,
 				"checkFlag": true,
 				"bookOtherFlag": false,
-				
-				
+
+
 				"rushBookTime": 2
 			}
 		},
@@ -151,7 +151,7 @@
 
 				this.checkFlag = false;
 			},
-			
+
 			/**
 			 * 获取房间信息
 			 * 
@@ -179,7 +179,7 @@
 				console.info(res);
 				this.dealWithRes(res);
 			},
-			
+
 			/**
 			 * 获取房间信息回调数据处理
 			 * 
@@ -254,13 +254,13 @@
 			 * @param {Object} res
 			 */
 			bookCallback(res) {
-				
-				if(res.statusCode != undefined && res.statusCode == 400 && this.rushBookTime > 0) {
+
+				if (res.statusCode != undefined && res.statusCode == 400 && this.rushBookTime > 0) {
 					this.rushBookTime = this.rushBookTime - 1;
 					bookHandle()
 					return;
 				}
-				
+
 				if (res.code == 12) {
 					uni.showLoading({
 						mask: true,
@@ -271,10 +271,17 @@
 					sendRequest(loginUrl, 'GET', null, null, this.AfterTimeGetTokenCallback, "after_time_login");
 					return;
 				}
-				
+
+				if (res.message == "系统可预约时间为 22:45 ~ 23:50") {
+					sleep(200);
+					bookHandle(); // 等待0.2秒重新抢座
+					return;
+				}
+
+
 				// 预约失败，约周围
 				if (res.status == "fail") {
-					sleep(500)
+					sleep(300)
 					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
@@ -349,7 +356,7 @@
 					if (this.countNum == 75) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, "reget_token")
+						sendRequest(loginUrl, 'GET', null, {}, this.reGetTokenCallback, "reget_token")
 					}
 
 					this.modelShowMag = parseFloat(this.countNum / 5) + "\tS";
@@ -387,7 +394,7 @@
 				this.endTimeIndex = e.target.value;
 				this.end = endTime[this.endPicker[e.target.value]]
 			},
-			
+
 			/**
 			 * 22:45后密码错误重新登录回调函数
 			 * 
@@ -403,7 +410,7 @@
 					title: "更新用户信息成功",
 					duration: 1200
 				})
-				
+
 				bookOther(this.room, "1", this.start, this.end, this.date);
 			}
 		}

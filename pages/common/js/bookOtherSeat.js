@@ -27,9 +27,9 @@ var rushBookTime = 1
 function bookOther(roomId, buildingId, start, end, d) {
 	uni.showLoading({
 		mask: true,
-		title: "正在抢周边座位"
+		title: "正在查询周边座位"
 	})
-	
+
 	startTime = start;
 	endTime = end;
 	date = d;
@@ -39,10 +39,10 @@ function bookOther(roomId, buildingId, start, end, d) {
 		'Accept': '*/*',
 		'Accept-Encoding': 'gzip, deflate, br',
 		'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-		'Connection': 'keep-alive',
-		//'Connection': 'close',
+		// 'Connection': 'keep-alive',
+		// //'Connection': 'close',
 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-		'Host': 'seat.lib.whu.edu.cn',
+		'Host': 'seat.lib.whu.edu.cn:8443',
 		'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 		'token': uni.getStorageSync('token')
 	}
@@ -80,6 +80,12 @@ function bookOther(roomId, buildingId, start, end, d) {
 				}
 				seatListSize = freeSeatIdList.length;
 				// 有空闲座位，直接尝试循环预约
+				uni.hideLoading();
+				uni.showLoading({
+					mask: true,
+					title: "开始预约周边座位"
+				})
+
 				bookFromFreeList();
 
 			} else {
@@ -90,6 +96,11 @@ function bookOther(roomId, buildingId, start, end, d) {
 			}
 		},
 		fail: (res) => {
+			uni.showToast({
+				icon: "none",
+				title: "网络错误，查询空闲座位失败"
+			})
+
 			console.warn(res);
 		}
 	})
@@ -116,7 +127,7 @@ function bookFromFreeList() {
 	if (seatIndex >= seatListSize) {
 		uni.showToast({
 			icon: "none",
-			title: "已经抢座"+ seatIndex +"次，附近已无同类座位"
+			title: "已经抢座" + seatIndex + "次，附近已无同类座位"
 		})
 		return;
 	}
@@ -145,13 +156,13 @@ function book(seatId) {
  * @param {Object} res 预约回调函数
  */
 function bookCallback(res) {
-	
-	if(res.statusCode != undefined && res.statusCode == 400 && rushBookTime > 0) {
+
+	if (res.statusCode != undefined && res.statusCode == 400 && rushBookTime > 0) {
 		rushBookTime = rushBookTime - 1;
 		book()
 		return;
 	}
-	
+
 	if (res.status == "success") {
 		uni.hideLoading();
 		hasSeat = true;
