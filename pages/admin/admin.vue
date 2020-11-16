@@ -53,7 +53,7 @@
 				})
 				
 				uni.request({
-					url: "",
+					url: appData_url,
 					method: "GET",
 					header: {
 						"Content-Type": "application/json",
