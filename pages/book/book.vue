@@ -272,9 +272,15 @@
 					return;
 				}
 				
+				if (res.message == "系统可预约时间为 22:45 ~ 23:50") {
+					sleep(200);
+					bookHandle(); // 等待0.2秒重新抢座
+					return;
+				}
+				
 				// 预约失败，约周围
 				if (res.status == "fail") {
-					sleep(500)
+					sleep(300)
 					bookOther(this.room, "1", this.start, this.end, this.date);
 					return;
 				}
@@ -349,7 +355,7 @@
 					if (this.countNum == 75) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						sendRequest(loginUrl, 'GET', null, null, this.reGetTokenCallback, "reget_token")
+						sendRequest(loginUrl, 'GET', null, {}, this.reGetTokenCallback, "reget_token")
 					}
 
 					this.modelShowMag = parseFloat(this.countNum / 5) + "\tS";

@@ -7,6 +7,10 @@ import {
 	sleep
 } from "@/pages/common/js/bookOtherSeat.js"
 
+import {
+	todayOrderTimeText
+} from "@/pages/common/js/timeUtil.js"
+
 /**
  * 暂时保留 
  */
@@ -63,7 +67,7 @@ function recordLog(operationType, message, status) {
 // 全局请求函数
 function sendRequest(url = '', method = 'GET', param = {}, header = null, callBack, operationType=null) {
 	if (header == null) {
-		var timestamps = (new Date()).valueOf();
+		var timestamps = (new Date(todayOrderTimeText + " 22:45:00")).getTime();
 		if (method == "GET") {
 			header = {
 				'Accept': '*/*',
@@ -88,7 +92,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 		
 	}
 	
-	if (param == null) {
+	if (param == null && url == book_url) {
 		param = {
 			'token': uni.getStorageSync('token')
 		}
@@ -117,7 +121,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 					recordLog(operationType, res.data.code + " " +res.data.message, 2);
 				}
 				
-				if (res.data.code == "1" && res.data.message == "预约失败，请尽快选择其他时段或座位") {
+				if (res.data.code == "1" && (res.data.message == "预约失败，请尽快选择其他时段或座位" || res.data.message == "系统可预约时间为 22:45 ~ 23:50")) {
 					callBack(res.data);
 					return;
 				}
