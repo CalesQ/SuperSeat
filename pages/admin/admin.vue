@@ -12,15 +12,15 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">改签成功率:</view>
-				<view class="title">{{appData.change_proportion}}  {{appData.change_percentage}}</view>
+				<view class="title">{{appData.change_proportion}}</view>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">预约成功率:</view>
-				<view class="title">{{appData.book_proportion}}  {{appData.book_percentage}}</view>
+				<view class="title">{{appData.book_proportion}}</view>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">更新成功率:</view>
-				<view class="title">{{appData.update_proportion}}  {{appData.update_percentage}}</view>
+				<view class="title">{{appData.update_proportion}}</view>
 			</view>
 		</view>
 	</view>
@@ -45,13 +45,18 @@
 				}
 			}
 		},
+		onShow() {
+			this.getData();
+		},
+		
 		methods: {
+			
 			getData() {
 				uni.showLoading({
 					mask: true,
 					title: "正在获取数据"
 				})
-				
+				var that = this;
 				uni.request({
 					url: appData_url,
 					method: "GET",
@@ -59,10 +64,17 @@
 						"Content-Type": "application/json",
 						"school_id": uni.getStorageSync("school_id")
 					},
-					
 					success(res) {
 						uni.hideLoading();
-						this.appData = res.data.data;
+						console.info(res)
+						if(res.data.code = 200) {
+							that.appData =  res.data.data;
+						} else {
+							uni.showToast({
+								icon: "none",
+								title: "获取失败"
+							})
+						}
 					},
 					
 					fail(res) {
