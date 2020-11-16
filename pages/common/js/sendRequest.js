@@ -70,7 +70,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 				'Accept-Encoding': 'gzip',
 				'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
 				'Host': 'seat.lib.whu.edu.cn:8443',
-				'User-Agent': "Dart/2.5（dart.io）",
+				'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 				'x-request-date': timestamps
 			}
 		} else {
@@ -81,7 +81,7 @@ function sendRequest(url = '', method = 'GET', param = {}, header = null, callBa
 				'transfer-encoding': 'chunked',
 				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 				'Host': 'seat.lib.whu.edu.cn:8443',
-				'User-Agent': "Dart/2.5（dart.io）",
+				'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
 				'x-request-date': timestamps
 			}
 		}
