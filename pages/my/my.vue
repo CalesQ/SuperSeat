@@ -33,6 +33,10 @@
 				<view class="title">当前预约状态：</view>
 				<view class="title">{{userInfo.reservationStatus == null ? "暂无" : reserveStat(userInfo.reservationStatus)}}</view>
 			</view>
+			<view @click="toAppDataPage" class="cu-form-group">
+				<view class="title">用户数据</view>
+				<view class="title">></view>
+			</view>
 		</view>
 		<view class="padding flex flex-direction">
 			<button class="cu-btn bg-blue margin-tb-sm lg" @click="exit">退出登录</button>
@@ -105,6 +109,9 @@
 				}
 			},
 
+			/**
+			 * 	退出按钮
+			 */
 			exit() {
 				this.removeUserInfo();
 
@@ -113,11 +120,18 @@
 				})
 			},
 
+			// 退出时移除数据
 			removeUserInfo() {
 				uni.setStorageSync("history_update", true);
 				uni.removeStorageSync("token");
 				uni.removeStorageSync("expire_time");
 				uni.removeStorageSync("pwd");
+			},
+			
+			toAppDataPage() {
+				uni.navigateTo({
+					url: "../admin/admin"
+				})
 			}
 		}
 	}
