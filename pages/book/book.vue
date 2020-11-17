@@ -9,7 +9,7 @@
 				限信息学部图书馆, 每日22:40后预约第二天，22:40前预约当前。抢座时请勿退出软件。
 			</view> -->
 			<view class="grid margin-bottom text-center">
-				限信息学部图书馆使用，现用于每日22:40后预约第二天的座位。抢座时请勿退出软件。
+				限信息学部图书馆使用。每日22:40后预约第二天，22:30前预约当天。约座时请勿退出软件。
 			</view>
 		</view>
 		<view class="cu-form-group margin-top">
@@ -129,7 +129,7 @@
 				"bookOtherFlag": false,
 
 
-				"rushBookTime": 2
+				"rushBookTime": 3
 			}
 		},
 
@@ -140,14 +140,14 @@
 			checkTime() {
 				var nowTime = getNowTimeYDSText();
 
-				if (nowTime < "22:40:00") {
-					this.checkFlag = true;
-					uni.showToast({
-						title: "限22:40后预约第二天座位",
-						icon: "none"
-					})
-					return;
-				}
+				// if (nowTime < "22:40:00") {
+				// 	this.checkFlag = true;
+				// 	uni.showToast({
+				// 		title: "限22:40后预约第二天座位",
+				// 		icon: "none"
+				// 	})
+				// 	return;
+				// }
 
 				this.checkFlag = false;
 			},
@@ -162,7 +162,7 @@
 				var roomName = this.roomPicker[e.target.value];
 				this.room = roomDic[roomName]
 				var newUrl = "";
-				if (getNowTimeYDSText() >= "22:45:00") {
+				if (getNowTimeYDSText() <= "22:30:00") {
 					newUrl = layout_url + this.room + "/" + getNowDate();
 				} else {
 					newUrl = layout_url + this.room + "/" + getTomorrowDate();
@@ -255,10 +255,20 @@
 			 */
 			bookCallback(res) {
 
-				if (res.statusCode != undefined && res.statusCode == 400 && this.rushBookTime > 0) {
-					this.rushBookTime = this.rushBookTime - 1;
-					bookHandle()
-					return;
+				if (res.statusCode != undefined && res.statusCode == 400) {
+					if (this.rushBookTime > 0) {
+						sleep(500);
+						this.bookHandle()
+						return;
+					} else {
+						sleep(100)
+						var param = {
+							"username": uni.getStorageSync("school_id"),
+							"password": uni.getStorageSync("pwd")
+						}
+						sendRequest(login_url, 'GET', param, null, this.reGetCallback, null);
+						return;
+					}
 				}
 
 				if (res.code == 12) {
@@ -281,8 +291,11 @@
 
 				// 预约失败，约周围
 				if (res.status == "fail") {
-					sleep(300)
-					bookOther(this.room, "1", this.start, this.end, this.date);
+					var param = {
+						"username": uni.getStorageSync("school_id"),
+						"password": uni.getStorageSync("pwd")
+					}
+					sendRequest(login_url, 'GET', param, null, this.reGetCallback, null);
 					return;
 				}
 				uni.hideLoading();
@@ -304,9 +317,9 @@
 			bookHandle() {
 				uni.hideLoading();
 				var body = {
-					"startTime": this.start.toString(),
-					"endTime": this.end.toString(),
-					"seat": this.seat.toString(),
+					"startTime": parseInt(this.start),
+					"endTime": parseInt(this.end),
+					"seat": parseInt(this.seat),
 					"date": this.date,
 					"token": uni.getStorageSync('token')
 				}
@@ -356,7 +369,7 @@
 					if (this.countNum == 75) {
 						var loginUrl = login_url + "?username=" + uni.getStorageSync("school_id") + "&password=" + uni.getStorageSync(
 							"pwd");
-						sendRequest(loginUrl, 'GET', null, {}, this.reGetTokenCallback, "reget_token")
+						sendRequest(loginUrl, 'GET', {}, null, this.reGetTokenCallback, "reget_token")
 					}
 
 					this.modelShowMag = parseFloat(this.countNum / 5) + "\tS";
@@ -411,6 +424,19 @@
 					duration: 1200
 				})
 
+				bookOther(this.room, "1", this.start, this.end, this.date);
+			},
+			
+			reGetCallback(res) {
+				uni.hideLoading();
+				uni.setStorageSync('token', res.data.token);
+				var expireTime = new Date().getTime() + 10 * 60 * 1000;
+				uni.setStorageSync('expire_time', expireTime);
+				uni.showToast({
+					icon: "none",
+					title: "更新用户信息成功",
+					duration: 1200
+				})
 				bookOther(this.room, "1", this.start, this.end, this.date);
 			}
 		}

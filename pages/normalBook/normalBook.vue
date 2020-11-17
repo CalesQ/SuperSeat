@@ -21,7 +21,12 @@
 					<view class="piker">{{endTimeText}}</view>
 				</picker>
 			</view>
-		
+			<view class="cu-form-group">
+				<view class="title">新的结束时间：</view>
+				<picker mode="time" :value="endTimeText" :start="startTimeText" :end="end" @change="bindEndTimeTextChange">
+					<view class="piker">{{endTimeText}}</view>
+				</picker>
+			</view>
 			<view class="padding flex flex-direction">
 				<button class="cu-btn bg-blue margin-tb-sm lg" @click="searchSeatOnTime">查询</button>
 			</view>
@@ -112,16 +117,14 @@
 			searchSeatOnTime() {
 				
 				var body = {
-					"t": "1",
 					"roomId": 1, // 一楼全部
 					"buildingId": 1,
 					"batch": "9999",
-					"page": "1",
-					"t2": "2",
+					"page": "1"
 				}
 				
 				var searchUrl = search_url + this.date + "/" + this.startTime + "/" + this.endTime;
-				sendRequest(searchUrl, "POST", body, null, this.searchSeatOnTimeCallback, null);
+				sendRequest(searchUrl, "GET", body, null, this.searchSeatOnTimeCallback, null);
 			},
 			
 			searchSeatOnTimeCallback(res) {

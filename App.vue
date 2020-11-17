@@ -138,6 +138,7 @@
 					if (res.statusCode == 200 && res.data.code === 101) {
 						
 						if(downloadUrl == "") {
+							uni.setStorageSync("wgt_version", this.appVersion);
 							return;
 						}
 						

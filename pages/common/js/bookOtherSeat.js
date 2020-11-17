@@ -21,6 +21,8 @@ var endTime = ""
 var date = ""
 var rushBookTime = 1
 
+var currentSeatId = ""
+
 /**
  * 查询指定时间内指定房间内的空余座位，若有则直接预约，没有则根据条件约其他的座位
  */
@@ -39,26 +41,24 @@ function bookOther(roomId, buildingId, start, end, d) {
 		'Accept': '*/*',
 		'Accept-Encoding': 'gzip, deflate, br',
 		'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-		// 'Connection': 'keep-alive',
-		// //'Connection': 'close',
 		'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 		'Host': 'seat.lib.whu.edu.cn:8443',
-		'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0',
-		'token': uni.getStorageSync('token')
+		'User-Agent': 'doSingle/11 CFNetwork/976 Darwin/18.2.0'
 	}
 
 	var body = {
 		"roomId": roomId,
-		"buildingId": buildingId,
+		//"buildingId": buildingId,
 		"batch": "9999",
 		"page": "1",
+		'token': uni.getStorageSync('token')
 	}
 
 	var searchUrl = search_url + date + "/" + startTime + "/" + endTime;
 	console.log(searchUrl)
 	uni.request({
 		url: searchUrl,
-		method: "POST",
+		method: "GET",
 		header: header,
 		data: body,
 		success: (res) => {
@@ -123,7 +123,7 @@ function sleep(numberMillis) {
  */
 function bookFromFreeList() {
 	seatIndex += 1;
-
+	rushBookTime = 1;
 	if (seatIndex >= seatListSize) {
 		uni.showToast({
 			icon: "none",
@@ -131,22 +131,27 @@ function bookFromFreeList() {
 		})
 		return;
 	}
-	var id = freeSeatIdList[seatIndex]
+	currentSeatId = freeSeatIdList[seatIndex]
 
-	book(id);
+	book();
 }
 
 /**
  * @param {Object} seatId 预约座位函数
  */
-function book(seatId) {
+function book() {
+	uni.showLoading({
+		mask: true,
+		title: "开始预约周边座位"
+	})
 	var body = {
-		"startTime": startTime.toString(),
-		"endTime": endTime.toString(),
-		"seat": seatId.toString(),
+		"startTime": parseInt(startTime),
+		"endTime": parseInt(endTime),
+		"seat": parseInt(currentSeatId),
 		"date": date,
 		"token": uni.getStorageSync('token')
 	}
+	console.info(body);
 	sendRequest(book_url, "POST", body, null, bookCallback, "book_other");
 }
 
@@ -157,10 +162,18 @@ function book(seatId) {
  */
 function bookCallback(res) {
 
-	if (res.statusCode != undefined && res.statusCode == 400 && rushBookTime > 0) {
-		rushBookTime = rushBookTime - 1;
-		book()
-		return;
+	if (res.statusCode != undefined && res.statusCode == 400) {
+		
+		if (rushBookTime > 0) {
+			rushBookTime = rushBookTime - 1;
+			sleep(200)
+			book();
+			return;
+		} else {
+			sleep(300);
+			bookFromFreeList();
+			return;
+		}
 	}
 
 	if (res.status == "success") {

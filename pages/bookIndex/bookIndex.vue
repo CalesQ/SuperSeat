@@ -5,11 +5,11 @@
 		</cu-custom>
 		<view class="bg-white padding">
 			<view @click="toRushBook" class="cu-form-group">
-				<view class="title">抢座</view>
+				<view class="title">抢座与约座</view>
 			</view>
-			<view @click="toNormalBook" class="cu-form-group">
+			<!-- <view @click="toNormalBook" class="cu-form-group">
 				<view class="title">正常约座</view>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -39,7 +39,7 @@
 			
 			toRushBook() {
 				
-				if(getNowTimeYDSText() < "22:40:00") {
+				if(getNowTimeYDSText() < "09:40:00") {
 					uni.showToast({
 						icon: "none",
 						title: "22:40:00后开始抢座"

@@ -83,7 +83,7 @@
 					"username": this.schoolId,
 					"password": this.pwd
 				}
-				sendRequest(requestUrl, 'GET', param, {}, this.callback, null);
+				sendRequest(requestUrl, 'GET', param, null, this.callback, null);
 			},
 
 			callback(res) {
